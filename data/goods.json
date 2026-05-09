@@ -1,0 +1,102 @@
+[
+  {
+    "id": "food",
+    "name": "Food Supplies",
+    "category": "Food",
+    "base_price": 40,
+    "volatility": 0.35,
+    "cargo_size": 1,
+    "illegal": false,
+    "description": "Basic foodstuffs and nutritional packs. High demand everywhere."
+  },
+  {
+    "id": "metal",
+    "name": "Refined Metals",
+    "category": "Raw",
+    "base_price": 120,
+    "volatility": 0.20,
+    "cargo_size": 2,
+    "illegal": false,
+    "description": "Processed ore and alloys for construction and manufacturing."
+  },
+  {
+    "id": "fuel",
+    "name": "Hyperium Fuel",
+    "category": "Industrial",
+    "base_price": 80,
+    "volatility": 0.25,
+    "cargo_size": 1,
+    "illegal": false,
+    "description": "Refined fuel for jump drives and ship engines."
+  },
+  {
+    "id": "machinery",
+    "name": "Industrial Machinery",
+    "category": "Industrial",
+    "base_price": 350,
+    "volatility": 0.15,
+    "cargo_size": 4,
+    "illegal": false,
+    "description": "Heavy equipment for factories and mining operations."
+  },
+  {
+    "id": "electronics",
+    "name": "Electronics",
+    "category": "Technology",
+    "base_price": 600,
+    "volatility": 0.20,
+    "cargo_size": 1,
+    "illegal": false,
+    "description": "Advanced computing components and sensor arrays."
+  },
+  {
+    "id": "luxuries",
+    "name": "Luxury Goods",
+    "category": "Luxury",
+    "base_price": 900,
+    "volatility": 0.45,
+    "cargo_size": 1,
+    "illegal": false,
+    "description": "High-value goods: art, rare substances, exotic materials."
+  },
+  {
+    "id": "weapons",
+    "name": "Weapons Cache",
+    "category": "Military",
+    "base_price": 1200,
+    "volatility": 0.30,
+    "cargo_size": 3,
+    "illegal": true,
+    "description": "Military-grade weapons. Illegal in Terran and Syndicate space."
+  },
+  {
+    "id": "narcotics",
+    "name": "Stimulants",
+    "category": "Luxury",
+    "base_price": 500,
+    "volatility": 0.60,
+    "cargo_size": 1,
+    "illegal": true,
+    "description": "Performance stimulants. Illegal in regulated space, highly valuable on the fringe."
+  },
+  {
+    "id": "ore",
+    "name": "Raw Ore",
+    "category": "Raw",
+    "base_price": 55,
+    "volatility": 0.20,
+    "cargo_size": 3,
+    "illegal": false,
+    "description": "Unprocessed mineral ore. Sold cheaply at mining outposts."
+  },
+  {
+    "id": "medical",
+    "name": "Medical Supplies",
+    "category": "Technology",
+    "base_price": 280,
+    "volatility": 0.30,
+    "cargo_size": 1,
+    "illegal": false,
+    "description": "Pharmaceuticals, medkits, and surgical equipment."
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "terran",
+    "name": "Terran Confederation",
+    "description": "A democratic coalition of core worlds. Values stability, law, and trade. The largest and most organized faction.",
+    "color": { "r": 0.27, "g": 0.47, "b": 1.0 },
+    "starting_reputation": 10,
+    "traits": ["democratic", "trade_focused", "moderate_military"]
+  },
+  {
+    "id": "syndicate",
+    "name": "Iron Syndicate",
+    "description": "A corporate military state run by an oligarchy of weapons manufacturers. Controls the most powerful fleet in known space.",
+    "color": { "r": 1.0, "g": 0.3, "b": 0.15 },
+    "starting_reputation": 0,
+    "traits": ["militaristic", "corporate", "expansionist"]
+  },
+  {
+    "id": "void_collective",
+    "name": "Void Collective",
+    "description": "Mysterious technocrats from the outer rim. Highly advanced technology but deeply isolationist. Few outsiders are welcomed.",
+    "color": { "r": 0.65, "g": 0.25, "b": 1.0 },
+    "starting_reputation": -5,
+    "traits": ["isolationist", "tech_advanced", "secretive"]
+  },
+  {
+    "id": "free_alliance",
+    "name": "Free Planets Alliance",
+    "description": "A loose coalition of free traders, rebels, and frontier settlers. No central government. Strength in numbers.",
+    "color": { "r": 0.2, "g": 0.9, "b": 0.45 },
+    "starting_reputation": 15,
+    "traits": ["decentralized", "trade_focused", "pirate_adjacent"]
+  },
+  {
+    "id": "independent",
+    "name": "Independent",
+    "description": "Unaffiliated systems — frontier outposts, pirate havens, and forgotten colonies.",
+    "color": { "r": 0.55, "g": 0.55, "b": 0.6 },
+    "starting_reputation": 0,
+    "traits": ["neutral"]
+  }
+]

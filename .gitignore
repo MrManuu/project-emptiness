@@ -1,0 +1,24 @@
+﻿# Godot
+.godot/
+*.import
+*.translation
+export_presets.cfg
+
+# C# / .NET build output
+.mono/
+obj/
+bin/
+*.user
+*.suo
+
+# Visual Studio
+.vs/
+*.csproj.user
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
