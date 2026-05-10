@@ -11,6 +11,7 @@ A 2D top-down space sandbox — Starsector's combat and aesthetic, X4 Foundation
 You start with a single ship and 50,000 credits in a procedurally generated galaxy of 64 star systems, divided between four rival factions. From there:
 
 - Trade goods between stations, exploiting price differences
+- Land on planets — explore, extract resources, interact with colonies
 - Join a faction, earn a commission, fly their flag
 - Build your own fleet — from a lone freighter to a capital ship armada
 - Establish stations and trade routes, build an economic empire
@@ -36,6 +37,7 @@ The universe runs without you. Factions expand, trade, and go to war. Prices flu
 - **Engine:** Godot 4.6.2 (.NET / C#)
 - **Language:** C# for all game logic and simulation
 - **Platform:** Windows (cross-platform export later)
+- **Workflow:** Claude writes all code, Manuel tests and gives feedback → 1-2 days per feature
 
 ---
 
@@ -56,20 +58,21 @@ The universe runs without you. Factions expand, trade, and go to war. Prices flu
 
 ## Current State
 
-**Version 0.1 — Galaxy Map (Tag 1)**
+**Day 2 complete — System View**
 
 ### What's playable
 - 64 procedurally generated star systems across 4 faction territories
-- Pan (right-click drag) and zoom (scroll wheel) the galaxy
-- Click any system → info panel (faction, star type, planets, security level)
-- Jump between connected systems via hyperlanes
-- Pulsing indicator shows your current location
+- Galaxy map: pan, zoom, click to select systems, jump via hyperlanes
+- **System view:** enter any system you're docked in — see orbiting planets (animated) and stations
+- Click planets → type, population, resources
+- Click stations → faction, goods inventory with live prices
 - Live economy: station prices fluctuate daily with supply and demand
 - HUD: credits, current day, current location
 
 ### What it looks like
 - Black space background with ambient star field
 - Stars colored by type: yellow, orange, red, blue, white, neutron (purple)
+- Planets colored by type: green (Terran), blue (Ocean), tan (Desert), white (Ice), red (Volcanic), brown (Gas Giant), grey (Barren), toxic green
 - Faction territory shown as colored glows around stars
 - Hyperlane network connecting all systems
 
@@ -77,11 +80,9 @@ The universe runs without you. Factions expand, trade, and go to war. Prices flu
 
 ## Roadmap
 
-Development pace: Claude writes all code, Manuel tests and gives feedback → **1-2 days per feature** instead of weeks.
-
 ### Month 1 — Gameplay Foundation
 - [x] Day 1: Galaxy map, navigation, factions, economy simulation
-- [ ] Day 2: System view — enter a system, see planets and stations
+- [x] Day 2: System view — orbiting planets and stations, click info
 - [ ] Day 3: Station trade screen — buy and sell goods
 - [ ] Day 4-5: Real-time combat — first ship battle
 - [ ] Day 6: Fleet management — buy and command 2-5 ships
@@ -94,10 +95,11 @@ Development pace: Claude writes all code, Manuel tests and gives feedback → **
 - [ ] Day 11-12: Faction AI — autonomous expansion, trade, war declarations
 - [ ] Day 13: Found your own faction
 - [ ] Day 14: Empire overview — your systems, income, fleets
-- [ ] Day 15: First graphics pass — AI-generated ship sprites (Midjourney)
-- [ ] Day 16-17: Weapon effects and explosions (shaders + particles)
-- [ ] Day 18: Ship upgrade system
-- [ ] Day 19-20: Combat polish — flux system, shields, tactics
+- [ ] Day 15: Planet landing — explore, extract resources, colony interaction *(gameplay scope TBD)*
+- [ ] Day 16: First graphics pass — AI-generated ship sprites (Midjourney)
+- [ ] Day 17-18: Weapon effects and explosions (shaders + particles)
+- [ ] Day 19: Ship upgrade system
+- [ ] Day 20: Combat polish — flux system, shields, tactics
 
 ### Month 3 — Content & Polish
 - [ ] Day 21-22: More ship classes (8+), more goods, random events
@@ -109,26 +111,42 @@ Development pace: Claude writes all code, Manuel tests and gives feedback → **
 
 ---
 
-## Project Structure
-
-```
-Project Emptiness/
-├── scenes/          — Godot scenes (GalaxyMap, SystemView, Combat, ...)
-├── src/
-│   ├── Core/        — GameState singleton
-│   ├── Data/        — Models: StarSystem, Faction, Ship, TradeGood
-│   ├── Generation/  — Procedural galaxy generator
-│   └── Simulation/  — Tick-based economy and faction AI
-└── data/            — JSON: factions, goods, ship templates
-```
-
----
-
 ## Controls
 
+### Galaxy Map
 | Input | Action |
 |---|---|
 | Right-click drag | Pan camera |
 | Scroll wheel | Zoom in/out |
 | Left-click | Select system |
 | Jump Here button | Travel to selected system |
+| Enter System button | Open system view (current system only) |
+
+### System View
+| Input | Action |
+|---|---|
+| Scroll wheel | Zoom in/out |
+| Left-click planet | Show planet info |
+| Left-click station | Show station goods |
+| ◀ Galaxy Map button | Return to galaxy map |
+
+---
+
+## Update Log
+
+### 2026-05-10 — Day 2: System View
+- System view scene implemented: animated orbiting planets + stations
+- Planet generation added (type, population, resources per planet)
+- Clickable planets and stations with info panel
+- "Enter System" button on galaxy map info panel
+- "◀ Galaxy Map" back button in system view
+- **Scope decision:** Planet landing and interaction added to roadmap (Day 15, gameplay TBD)
+
+### 2026-05-10 — Day 1: Galaxy Map
+- Initial release
+- 64-system procedural galaxy with spiral distribution
+- 4 main factions + independent territory via flood-fill
+- Hyperlane network (MST-guaranteed connectivity)
+- Pan/zoom/click navigation, system jump
+- Tick-based economy: supply/demand price fluctuation
+- HUD: credits, day counter, location

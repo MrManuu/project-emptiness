@@ -1,19 +1,15 @@
 # CLAUDE.md — Project Emptiness
 
-Projektspezifische Anweisungen für Claude. Diese Datei wird zu Beginn jeder Session gelesen.
+Claude-spezifische Anweisungen. Diese Datei wird zu Beginn jeder Session gelesen.
+Für Roadmap, Update Log und Current State → README.md.
 
 ---
 
-## Was wir bauen
+## Kern-Vision
 
-Ein **2D Top-Down Space Sandbox** — visuell inspiriert von Starsector + The Last Starship, gameplay-technisch nahe an X4 Foundations, aber in 2D.
+2D Top-Down Space Sandbox. Mit einem Schiff starten, Handel treiben, kämpfen, Imperium aufbauen, eigene Fraktion gründen. Lebendiges Universum mit Wirtschaft und Fraktions-KI.
 
-**Kern-Vision:** Mit einem einzigen Schiff starten, Handel treiben, Fraktionen beitreten oder bekämpfen, eine eigene Fraktion gründen, und schließlich ein Imperium aus Schiffen, Stationen und Territorien aufbauen — alles in einem lebendigen Universum mit echter Wirtschaft und Fraktions-KI.
-
-**Referenzspiele:**
-- **Starsector** (Fractal Softworks) — Visueller Stil, Echtzeit-Kampf, Fraktions-System, Kolonie-Mechanik
-- **The Last Starship** (Introversion) — Schiffs-Innenraum als Querschnitt, UI-Stil, Klarheit
-- **X4 Foundations** (Egosoft) — Wirtschaftssystem, Empire Building, Diplomatie, Fraktions-KI
+**Referenzspiele:** Starsector (Kampf, Stil), The Last Starship (UI, Innenraum), X4 Foundations (Wirtschaft, Empire)
 
 ---
 
@@ -22,17 +18,20 @@ Ein **2D Top-Down Space Sandbox** — visuell inspiriert von Starsector + The La
 | Bereich | Technologie |
 |---|---|
 | Engine | **Godot 4.6.2 .NET** |
-| Sprache | **C#** (.NET 8) für alle Simulation/Logik |
+| Sprache | **C#** (.NET 8) |
 | Namespace | `ProjectEmptiness` |
-| .csproj | `Project Emptiness.csproj` (von Godot generiert, nicht überschreiben) |
-| Nullable | `#nullable enable` am Anfang jeder .cs Datei die Nullable-Annotations nutzt |
-| Platform | Windows (später cross-platform via Godot Export) |
+| Nullable | `#nullable enable` per-File, nie via .csproj |
+| Platform | Windows |
 
-**Wichtig:** Das `.csproj` wird von Godot verwaltet — nie manuell ersetzen. Stattdessen `#nullable enable` per-File setzen.
+**Godot-Gotchas:**
+- `.csproj` wird von Godot verwaltet → nie manuell ersetzen
+- `#nullable enable` per-File setzen (nicht global in .csproj)
+- `.tscn` Format 3 ohne UIDs (UIDs verursachten "format too new" Fehler)
+- `Dictionary<K,V>.GetValueOrDefault()` existiert nicht → explizites `ContainsKey` verwenden
 
 ---
 
-## Architektur — Drei Schichten
+## Architektur
 
 ```
 Rendering Layer     → Godot Scenes (.tscn + .cs Node-Scripts)
@@ -40,16 +39,17 @@ Simulation Layer    → Pure C# Klassen, tick-basiert (kein Godot-Inheritance)
 Data Layer          → JSON-Dateien in /data/, geladen beim Start
 ```
 
-### Autoloads (Singletons)
-- `GameState` (`src/Core/GameState.cs`) — zentraler Zustand: Galaxie, Spieler, Fraktionen
+**Autoloads (Singletons):**
+- `GameState` (`src/Core/GameState.cs`) — zentraler Zustand: Galaxie, Spieler, Fraktionen, Signals
 - `SimulationManager` (`src/Simulation/SimulationManager.cs`) — Tick-Engine (1 Tag = 24 Sek)
 
-### Szenen-Modi
+**Szenen-Modi:**
 | Szene | Status | Beschreibung |
 |---|---|---|
 | `GalaxyMap` | ✅ Fertig | Galaxie-Übersicht, Pan/Zoom, Navigation, Info-Panel, HUD |
-| `SystemView` | 🔲 Next | System-Ansicht: Planeten, Stationen, lokale Flotten |
-| `StationTrade` | 🔲 Geplant | Handelscreen: kaufen/verkaufen, Preise, Lager |
+| `SystemView` | ✅ Fertig | Planeten + Stationen in einem System, animiert, klickbar |
+| `PlanetView` | 🔲 Geplant | Planet-Landung, Interaktion (Gameplay TBD) |
+| `StationTrade` | 🔲 Next | Handelscreen: kaufen/verkaufen, Preise, Lager |
 | `Combat` | 🔲 Geplant | Echtzeit-Kampf (Starsector-Stil), Waffen, Schilde, Flux |
 | `StationInterior` | 🔲 Später | Schiffs-Innenraum (The Last Starship Querschnitt) |
 
@@ -62,21 +62,22 @@ Project Emptiness/
 ├── project.godot
 ├── Project Emptiness.csproj   ← Godot-generiert, nicht ersetzen
 ├── scenes/
-│   ├── Main/                  ← Entry Point
+│   ├── Main/                  ← Entry Point (lädt erste Szene)
 │   ├── GalaxyMap/             ← ✅ Fertig
-│   ├── SystemView/            ← 🔲 Next
+│   ├── SystemView/            ← ✅ Fertig
+│   ├── StationTrade/          ← 🔲 Next
 │   ├── Combat/                ← 🔲 Geplant
 │   └── StationInterior/       ← 🔲 Später
 ├── src/
 │   ├── Core/GameState.cs      ← Singleton, Signals, Spielzustand
 │   ├── Data/
-│   │   ├── Enums.cs           ← StarType, ShipClass, FactionStance, ...
+│   │   ├── Enums.cs           ← StarType, ShipClass, FactionStance, PlanetType, ...
 │   │   ├── StarSystem.cs      ← StarSystem, Planet, Station
 │   │   ├── Faction.cs         ← Faction + Reputationslogik
 │   │   ├── Ship.cs            ← PlayerShip, ShipTemplate
 │   │   └── TradeGood.cs
 │   ├── Generation/
-│   │   └── GalaxyGenerator.cs ← 64 Systeme, Spiral, MST, Flood-Fill
+│   │   └── GalaxyGenerator.cs ← 64 Systeme, Planeten, Stationen, Fraktionen
 │   └── Simulation/
 │       └── SimulationManager.cs ← Wirtschaft + Diplomatie-Drift
 └── data/
@@ -86,105 +87,29 @@ Project Emptiness/
 
 ---
 
-## Aktueller Stand (Tag 1 — 10. Mai 2026)
-
-### Fertig implementiert
-- **Galaxie-Generator** — 64 prozedurale Systeme, Spiral-Verteilung, MST-Konnektivität, Fraktionszuweisung per Flood-Fill
-- **Fraktionen** — 5 Fraktionen (Terran, Syndicate, Void Collective, Free Alliance, Independent), Farben, Relations-Matrix, Reputationssystem
-- **Galaxie-Karte** — Pan/Zoom, Klick-Auswahl, Info-Panel, Jump über Hyperlanes, pulsierender Spieler-Indikator
-- **HUD** — Credits, Day-Counter, aktuelle Location
-- **Wirtschafts-Tick** — Stationen mit Lagerbeständen + Preisschwankung (Angebot/Nachfrage)
-- **Diplomatie-Grundlage** — Relations-Dictionary, langsame Drift per Tag
-- **Hintergrund** — Schwarzer Weltraum, Sternfeld, Fraktions-Glow auf Systemen
-
-### Bekannte TODOs
-- System-Namen bei einigen Systemen zu lang → Label-Clipping
-- Kein Save/Load System noch
-- Kamera springt nicht smooth zu neuem System nach Jump
-
----
-
-## Entwicklungs-Tempo
-
-Claude schreibt den gesamten Code, Nutzer (Manuel) testet und gibt Feedback. Dadurch ist das Tempo deutlich schneller als bei Solo-Entwicklung:
-- **1-2 Tage** pro Feature statt 1-2 Wochen
-- Gameplay-Systeme: in ~2 Monaten vollständig
-- Grafik-Pass: ab Monat 2, wenn Mechaniken stabil sind
-
----
-
-## Zeitplan (tagesbasiert)
-
-### Monat 1 — Gameplay-Fundament
-```
-Tag 1   ✅ Galaxy Map + Navigation + Wirtschafts-Tick + Fraktionen
-Tag 2      System View (Planeten + Stationen in einem System)
-Tag 3      Stations-Handelscreen (kaufen/verkaufen)
-Tag 4-5    Basis-Kampf (Echtzeit, Platzhalter-Schiffe)
-Tag 6      Flotte — 2-5 Schiffe kaufen + befehligen
-Tag 7      Fraktions-Reputation (Konsequenzen: Preise, Feindseligkeit)
-Tag 8      Missions-System (Handelsrouten, Kopfgelder, Eskorten)
-Tag 9      Station kaufen/errichten
-Tag 10     Diplomatie-Screen (Allianzen, Verträge, Tribute)
-```
-
-### Monat 2 — Empire & KI
-```
-Tag 11-12  Fraktions-KI (baut, handelt, erklärt Kriege autonom)
-Tag 13     Eigene Fraktion gründen
-Tag 14     Empire-Übersicht (eigene Systeme, Einnahmen, Flotten)
-Tag 15     Erster Grafik-Pass — AI-Sprites für Schiffe (Midjourney)
-Tag 16-17  Waffen-Effekte, Explosionen (Shader + Partikel, kein Sprite nötig)
-Tag 18     Schiffs-Upgrade-System
-Tag 19-20  Kampf-Polish (Flux-System, Schilde, Taktik)
-```
-
-### Monat 3 — Content & Polish
-```
-Tag 21-22  Mehr Schiffsklassen (8+), mehr Waren, Events
-Tag 23     Sound + Musik-Integration
-Tag 24     Schiffs-Innenraum (The Last Starship Stil)
-Tag 25-26  UI/UX finaler Pass, Sci-Fi Font
-Tag 27-28  Save/Load System
-Tag 29-30  Balance + Beta-Vorbereitung
-```
-
----
-
-## Grafik-Strategie
-
-**Phase 1 (Monat 1):** Nur Platzhalter — geometrische Formen, Farben, Partikel
-**Phase 2 (Monat 2):** AI-generierte Sprites via **Midjourney** (beste Qualität für Top-Down Sci-Fi Schiffe)
-**Phase 3 (Monat 3):** Shader-Effekte für Waffen/Explosionen (100% Code, kein Sprite)
-
-Claude kann keine Sprite-Assets erstellen. Manuel generiert Sprites mit Midjourney wenn Mechaniken stabil sind.
-
----
-
-## Design-Entscheidungen (festgelegt)
-
-| Thema | Entscheidung | Begründung |
-|---|---|---|
-| Engine | Godot 4.6 + C# | Claude schreibt alles, Manuel testet |
-| Scope | ~3 Monate für spielbaren Core | Tagesbasiertes Tempo mit AI-Entwickler |
-| Wirtschaft | Abstrahiert (Formel-basiert) | X4-Feeling ohne vollständige Simulation |
-| KI-Simulation | Tick-basiert (1 Tag = 24 Sek) | Performance, kein Frame-Tracking |
-| 3D | Nein, komplett 2D | Top-Down |
-| Grafik-Timing | Erst Mechaniken, dann Sprites | Sprites nicht vor stabilem Gameplay |
-| Innenraum | The Last Starship Querschnitt-Stil | Q2, nach Kampf + Handel |
-
----
-
 ## Coding-Konventionen
 
 - **Namespace:** Immer `ProjectEmptiness.XYZ`
 - **Node-Scripts:** `partial class` extends Godot-Typ
 - **Simulation-Klassen:** Pure C#, kein Godot-Inheritance
-- **Nullable:** `#nullable enable` per-File, nie via .csproj
-- **Signals:** In `GameState` zentralisiert
+- **Signals:** In `GameState` zentralisiert, in `_ExitTree()` wieder abmelden
 - **Kein GDScript** — alles C#
 - **Keine Kommentare** außer bei nicht-offensichtlichem Verhalten
 - **JSON** für alle Spieldaten
+
+---
+
+## Design-Entscheidungen
+
+| Thema | Entscheidung | Begründung |
+|---|---|---|
+| Engine | Godot 4.6 + C# | Claude schreibt alles, Manuel testet |
+| Wirtschaft | Abstrahiert (Formel-basiert) | X4-Feeling ohne vollständige Simulation |
+| KI-Simulation | Tick-basiert (1 Tag = 24 Sek) | Performance, kein Frame-Tracking |
+| 3D | Nein, komplett 2D | Top-Down |
+| Grafik-Timing | Erst Mechaniken, dann Sprites | Sprites ab Monat 2 via Midjourney |
+| Innenraum | The Last Starship Querschnitt-Stil | Monat 3, nach Kampf + Handel |
+| Planet Landing | Geplant für Monat 2 (Tag 15) | Gameplay-Scope noch TBD |
 
 ---
 
@@ -192,6 +117,7 @@ Claude kann keine Sprite-Assets erstellen. Manuel generiert Sprites mit Midjourn
 
 - **Hintergrund:** `Color(0.02, 0.02, 0.055)` — fast schwarz, Blaustich
 - **Sternfarben:** Yellow `#FFD938`, Orange `#FF8C1F`, Red `#EB3A2E`, Blue `#4794FF`, White `#EDF0FF`, Neutron `#AE47FF`
+- **Planetfarben:** Terran grün, Ocean blau, Desert braun, Ice weiß, Volcanic rot, GasGiant braun-orange, Barren grau, Toxic giftgrün
 - **Fraktionsfarben:** Terran `#4577FF`, Syndicate `#FF4D26`, Void `#A640FF`, Alliance `#33E573`
 - **UI:** Dunkle Panels, helle Labels, Sci-Fi-minimalistisch
 - **Font:** Godot FallbackFont jetzt → Sci-Fi Monospace Font in Monat 3

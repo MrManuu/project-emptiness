@@ -29,6 +29,9 @@ public class GalaxyGenerator
     private static readonly string[] Suffixes =
         { "Prime", "Minor", "Major", "VI", "VII", "IX", "XII", "A", "B", "II", "III", "IV" };
 
+    private static readonly string[] RomanNumerals =
+        { "I", "II", "III", "IV", "V", "VI", "VII", "VIII" };
+
     public List<StarSystem> Generate(int seed, int systemCount = 64)
     {
         _rng = new Random(seed);
@@ -52,6 +55,7 @@ public class GalaxyGenerator
             .First();
         startingSystem.IsStartingSystem = true;
 
+        GeneratePlanets(systems);
         GenerateStations(systems);
 
         return systems;
@@ -196,6 +200,61 @@ public class GalaxyGenerator
             system.FactionId = dist < 320f ? nearest.FactionId : "independent";
         }
     }
+
+    private void GeneratePlanets(List<StarSystem> systems)
+    {
+        foreach (var sys in systems)
+        {
+            for (int i = 0; i < sys.PlanetCount; i++)
+            {
+                var type = RollPlanetType();
+                sys.Planets.Add(new Planet
+                {
+                    Name = $"{sys.Name} {RomanNumerals[i]}",
+                    Type = type,
+                    Population = RollPopulation(type),
+                    Resources = GetResources(type)
+                });
+            }
+        }
+    }
+
+    private PlanetType RollPlanetType()
+    {
+        float roll = (float)_rng.NextDouble();
+        return roll switch
+        {
+            < 0.25f => PlanetType.Barren,
+            < 0.40f => PlanetType.Desert,
+            < 0.52f => PlanetType.Terran,
+            < 0.62f => PlanetType.Ocean,
+            < 0.72f => PlanetType.Ice,
+            < 0.82f => PlanetType.Volcanic,
+            < 0.93f => PlanetType.GasGiant,
+            _       => PlanetType.Toxic
+        };
+    }
+
+    private int RollPopulation(PlanetType type) => type switch
+    {
+        PlanetType.Terran => _rng.NextDouble() < 0.7 ? _rng.Next(1_000_000, 2_000_000_000) : 0,
+        PlanetType.Ocean  => _rng.NextDouble() < 0.4 ? _rng.Next(500_000, 500_000_000)     : 0,
+        PlanetType.Desert => _rng.NextDouble() < 0.2 ? _rng.Next(100_000, 50_000_000)      : 0,
+        _ => 0
+    };
+
+    private static List<string> GetResources(PlanetType type) => type switch
+    {
+        PlanetType.Barren   => new() { "Ore", "Minerals" },
+        PlanetType.Desert   => new() { "Rare Metals", "Silicates" },
+        PlanetType.Terran   => new() { "Food", "Organics" },
+        PlanetType.Ocean    => new() { "Water", "Organics" },
+        PlanetType.Ice      => new() { "Ice", "Volatiles" },
+        PlanetType.Volcanic => new() { "Metal", "Ore" },
+        PlanetType.GasGiant => new() { "Gas", "Helium-3" },
+        PlanetType.Toxic    => new() { "Rare Metals", "Chemicals" },
+        _                   => new()
+    };
 
     private void GenerateStations(List<StarSystem> systems)
     {

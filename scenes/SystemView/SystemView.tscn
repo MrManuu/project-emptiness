@@ -1,12 +1,11 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scenes/GalaxyMap/GalaxyMap.cs" id="1_galaxymap"]
+[ext_resource type="Script" path="res://scenes/SystemView/SystemView.cs" id="1_systemview"]
 
-[node name="GalaxyMap" type="Node2D"]
-script = ExtResource("1_galaxymap")
+[node name="SystemView" type="Node2D"]
+script = ExtResource("1_systemview")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(0.85, 0.85)
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -32,24 +31,30 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="Location" type="Label" parent="UI/HUD/TopBar/HBoxContainer"]
+[node name="BackBtn" type="Button" parent="UI/HUD/TopBar/HBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 3
-text = "Location: —"
+text = "◀  Galaxy Map"
 theme_override_font_sizes/font_size = 13
 
-[node name="Day" type="Label" parent="UI/HUD/TopBar/HBoxContainer"]
+[node name="SystemTitle" type="Label" parent="UI/HUD/TopBar/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 1
-text = "Day 1"
+text = "System Name"
 theme_override_font_sizes/font_size = 13
 
 [node name="Credits" type="Label" parent="UI/HUD/TopBar/HBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 1
 horizontal_alignment = 2
 text = "Credits: 50,000"
+theme_override_font_sizes/font_size = 13
+
+[node name="Day" type="Label" parent="UI/HUD/TopBar/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+horizontal_alignment = 2
+text = "Day 1"
 theme_override_font_sizes/font_size = 13
 
 [node name="InfoPanel" type="PanelContainer" parent="UI"]
@@ -60,10 +65,10 @@ anchor_left = 1.0
 anchor_top = 0.0
 anchor_right = 1.0
 anchor_bottom = 0.0
-offset_left = -300.0
+offset_left = -320.0
 offset_top = 46.0
 offset_right = -10.0
-offset_bottom = 340.0
+offset_bottom = 380.0
 
 [node name="VBox" type="VBoxContainer" parent="UI/InfoPanel"]
 layout_mode = 2
@@ -76,45 +81,26 @@ offset_right = -12.0
 offset_bottom = -10.0
 theme_override_constants/separation = 6
 
-[node name="SystemName" type="Label" parent="UI/InfoPanel/VBox"]
+[node name="ObjectName" type="Label" parent="UI/InfoPanel/VBox"]
 layout_mode = 2
-text = "System Name"
+text = "Object Name"
 theme_override_font_sizes/font_size = 18
 
 [node name="Sep" type="HSeparator" parent="UI/InfoPanel/VBox"]
 layout_mode = 2
 
-[node name="StarType" type="Label" parent="UI/InfoPanel/VBox"]
+[node name="Details" type="Label" parent="UI/InfoPanel/VBox"]
 layout_mode = 2
-text = "Star: —"
+text = "Details"
 theme_override_font_sizes/font_size = 12
-
-[node name="Faction" type="Label" parent="UI/InfoPanel/VBox"]
-layout_mode = 2
-text = "Faction: —"
-theme_override_font_sizes/font_size = 12
-
-[node name="Planets" type="Label" parent="UI/InfoPanel/VBox"]
-layout_mode = 2
-text = "Planets: —"
-theme_override_font_sizes/font_size = 12
-
-[node name="Security" type="Label" parent="UI/InfoPanel/VBox"]
-layout_mode = 2
-text = "Security: —"
-theme_override_font_sizes/font_size = 12
+autowrap_mode = 2
 
 [node name="Spacer" type="Control" parent="UI/InfoPanel/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="JumpBtn" type="Button" parent="UI/InfoPanel/VBox"]
+[node name="DockBtn" type="Button" parent="UI/InfoPanel/VBox"]
 layout_mode = 2
-text = "Jump Here"
-theme_override_font_sizes/font_size = 13
-
-[node name="EnterBtn" type="Button" parent="UI/InfoPanel/VBox"]
-layout_mode = 2
-disabled = true
-text = "▶  Enter System"
+visible = false
+text = "⚓  Dock at Station"
 theme_override_font_sizes/font_size = 13

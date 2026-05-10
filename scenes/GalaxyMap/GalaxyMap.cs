@@ -9,6 +9,8 @@ namespace ProjectEmptiness.Scenes;
 
 public partial class GalaxyMap : Node2D
 {
+    private static readonly PackedScene SystemViewScene =
+        GD.Load<PackedScene>("res://scenes/SystemView/SystemView.tscn");
     // ── Visual constants ───────────────────────────────────────────────────────
     private const float StarRadius       = 7f;
     private const float GlowRadius       = 22f;
@@ -37,6 +39,7 @@ public partial class GalaxyMap : Node2D
     private Label    _lblPlanets     = null!;
     private Label    _lblSecurity    = null!;
     private Button   _btnJump        = null!;
+    private Button   _btnEnter       = null!;
     private Label    _lblCredits     = null!;
     private Label    _lblDay         = null!;
     private Label    _lblLocation    = null!;
@@ -59,11 +62,13 @@ public partial class GalaxyMap : Node2D
         _lblPlanets    = GetNode<Label>("UI/InfoPanel/VBox/Planets");
         _lblSecurity   = GetNode<Label>("UI/InfoPanel/VBox/Security");
         _btnJump       = GetNode<Button>("UI/InfoPanel/VBox/JumpBtn");
+        _btnEnter      = GetNode<Button>("UI/InfoPanel/VBox/EnterBtn");
         _lblCredits    = GetNode<Label>("UI/HUD/TopBar/HBoxContainer/Credits");
         _lblDay        = GetNode<Label>("UI/HUD/TopBar/HBoxContainer/Day");
         _lblLocation   = GetNode<Label>("UI/HUD/TopBar/HBoxContainer/Location");
 
-        _btnJump.Pressed += OnJumpPressed;
+        _btnJump.Pressed  += OnJumpPressed;
+        _btnEnter.Pressed += OnEnterPressed;
         _infoPanel.Visible = false;
 
         GameState.Instance.SystemChanged += OnSystemChanged;
@@ -259,10 +264,11 @@ public partial class GalaxyMap : Node2D
         _lblPlanets.Text    = $"Planets:  {sys.PlanetCount}";
         _lblSecurity.Text   = $"Security: {sys.Security}";
 
-        bool reachable    = gs.CanJumpTo(sys);
-        bool isCurrent    = sys == gs.CurrentSystem;
-        _btnJump.Text     = isCurrent ? "[ current location ]" : reachable ? "▶  Jump Here" : "✕  Not in range";
-        _btnJump.Disabled = isCurrent || !reachable;
+        bool reachable     = gs.CanJumpTo(sys);
+        bool isCurrent     = sys == gs.CurrentSystem;
+        _btnJump.Text      = isCurrent ? "[ current location ]" : reachable ? "▶  Jump Here" : "✕  Not in range";
+        _btnJump.Disabled  = isCurrent || !reachable;
+        _btnEnter.Disabled = !isCurrent;
 
         _infoPanel.Visible = true;
     }
@@ -274,6 +280,11 @@ public partial class GalaxyMap : Node2D
         if (_selected == null) return;
         GameState.Instance.JumpToSystem(_selected);
         ShowInfo(_selected);
+    }
+
+    private void OnEnterPressed()
+    {
+        GetTree().Root.GetNode<Main>("Main").LoadScene(SystemViewScene);
     }
 
     // ── HUD refresh ────────────────────────────────────────────────────────────
