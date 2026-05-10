@@ -27,9 +27,8 @@ public partial class SystemView : Node2D
     private static readonly Color OrbitColor = new(1f, 1f, 1f, 0.06f);
     private static readonly Color TextColor  = new(0.75f, 0.8f, 0.95f, 0.65f);
 
-    // Textures
-    private Texture2D _planetSheet1 = null!;
-    private Texture2D _planetSheet2 = null!;
+    // Planet Sprite2D nodes (positioned each frame)
+    private Sprite2D[] _planetSprites = Array.Empty<Sprite2D>();
 
     // State
     private Camera2D   _camera        = null!;
@@ -53,30 +52,47 @@ public partial class SystemView : Node2D
         _camera = GetNode<Camera2D>("Camera2D");
         _system = GameState.Instance.CurrentSystem!;
 
-        // Background nebula
+        // Background
         var bgRect = GetNode<TextureRect>("Background/BgRect");
         bgRect.Texture  = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-02-painterly-probe/background-01.png");
         bgRect.Modulate = new Color(0.6f, 0.55f, 0.7f, 1f);
 
-        // Planet sheets (1024x1024, 2x2 grid — planets in bottom half)
-        _planetSheet1 = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-01-clean-tactical/planet-01.png");
-        _planetSheet2 = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-01-clean-tactical/planet-02.png");
+        // Planet sprites with circular clip shader
+        var sheet1 = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-01-clean-tactical/planet-01.png");
+        var sheet2 = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-01-clean-tactical/planet-02.png");
+        var circleMat = MakeCircleClipMaterial();
 
-        // Player ship
+        _planetSprites = new Sprite2D[_system.Planets.Count];
+        for (int i = 0; i < _system.Planets.Count; i++)
+        {
+            var (sheet, region) = GetPlanetSprite(_system.Planets[i].Type, sheet1, sheet2);
+            var atlas = new AtlasTexture { Atlas = sheet, Region = region };
+            var sprite = new Sprite2D
+            {
+                Texture  = atlas,
+                Scale    = new Vector2(PlanetSpriteHalf * 2f / 512f, PlanetSpriteHalf * 2f / 512f),
+                Material = circleMat,
+                ZIndex   = 1
+            };
+            AddChild(sprite);
+            _planetSprites[i] = sprite;
+        }
+
+        // Player ship with dark-remove shader
         var ship = GetNode<Sprite2D>("PlayerShip");
-        ship.Texture = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-01-clean-tactical/ship-01.png");
-        ship.Scale   = new Vector2(0.055f, 0.055f);
+        ship.Texture  = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-01-clean-tactical/ship-01.png");
+        ship.Scale    = new Vector2(0.055f, 0.055f);
+        ship.Material = MakeDarkRemoveMaterial();
 
+        // Orbit angles
         int p = _system.Planets.Count;
         int s = _system.Stations.Count;
         _planetAngles  = new float[p];
         _stationAngles = new float[s];
+        for (int i = 0; i < p; i++) _planetAngles[i]  = p > 1 ? i * (Mathf.Tau / p) : 0f;
+        for (int i = 0; i < s; i++) _stationAngles[i] = (s > 1 ? i * (Mathf.Tau / s) : 0f) + 1.2f;
 
-        for (int i = 0; i < p; i++)
-            _planetAngles[i] = p > 1 ? i * (Mathf.Tau / p) : 0f;
-        for (int i = 0; i < s; i++)
-            _stationAngles[i] = (s > 1 ? i * (Mathf.Tau / s) : 0f) + 1.2f;
-
+        // UI
         _lblSystemTitle = GetNode<Label>("UI/HUD/TopBar/HBoxContainer/SystemTitle");
         _infoPanel      = GetNode<Control>("UI/InfoPanel");
         _lblObjectName  = GetNode<Label>("UI/InfoPanel/VBox/ObjectName");
@@ -106,7 +122,11 @@ public partial class SystemView : Node2D
     {
         float dt = (float)delta;
         for (int i = 0; i < _planetAngles.Length; i++)
+        {
             _planetAngles[i] += OrbitSpeeds[Math.Min(i, OrbitSpeeds.Length - 1)] * dt;
+            float r = OrbitRadii[Math.Min(i, OrbitRadii.Length - 1)];
+            _planetSprites[i].Position = new Vector2(MathF.Cos(_planetAngles[i]) * r, MathF.Sin(_planetAngles[i]) * r);
+        }
         for (int i = 0; i < _stationAngles.Length; i++)
         {
             int slot = _system.Planets.Count + i;
@@ -120,7 +140,7 @@ public partial class SystemView : Node2D
     {
         if (_system == null) return;
         DrawStar();
-        DrawPlanetsAndStations();
+        DrawOrbitsLabelsStations();
     }
 
     private void DrawStar()
@@ -130,8 +150,9 @@ public partial class SystemView : Node2D
         DrawCircle(Vector2.Zero, StarRadius, col);
     }
 
-    private void DrawPlanetsAndStations()
+    private void DrawOrbitsLabelsStations()
     {
+        // Orbit rings
         for (int i = 0; i < _system.Planets.Count; i++)
             DrawArc(Vector2.Zero, OrbitRadii[Math.Min(i, OrbitRadii.Length - 1)],
                 0, Mathf.Tau, 64, OrbitColor, 1f, true);
@@ -143,23 +164,17 @@ public partial class SystemView : Node2D
                 0, Mathf.Tau, 64, new Color(0.8f, 0.8f, 0.5f, 0.05f), 1f, true);
         }
 
+        // Planet selection ring + label (planet disc rendered by Sprite2D node)
         for (int i = 0; i < _system.Planets.Count; i++)
         {
-            float r   = OrbitRadii[Math.Min(i, OrbitRadii.Length - 1)];
-            var   pos = new Vector2(MathF.Cos(_planetAngles[i]) * r, MathF.Sin(_planetAngles[i]) * r);
-
+            var pos = _planetSprites[i].Position;
             if (i == _selectedPlanet)
                 DrawArc(pos, PlanetSpriteHalf + 5f, 0, Mathf.Tau, 24, new Color(1f, 1f, 1f, 0.6f), 1.5f, true);
-
-            var (sheet, region) = GetPlanetSprite(_system.Planets[i].Type);
-            var destRect = new Rect2(pos - new Vector2(PlanetSpriteHalf, PlanetSpriteHalf),
-                                     new Vector2(PlanetSpriteHalf * 2f, PlanetSpriteHalf * 2f));
-            DrawTextureRectRegion(sheet, destRect, region);
-
             DrawString(ThemeDB.FallbackFont, pos + new Vector2(PlanetSpriteHalf + 3f, 3f),
                 _system.Planets[i].Name, HorizontalAlignment.Left, -1, 10, TextColor);
         }
 
+        // Stations
         for (int i = 0; i < _system.Stations.Count; i++)
         {
             int   slot = _system.Planets.Count + i;
@@ -205,9 +220,7 @@ public partial class SystemView : Node2D
     {
         for (int i = 0; i < _system.Planets.Count; i++)
         {
-            float r   = OrbitRadii[Math.Min(i, OrbitRadii.Length - 1)];
-            var   pos = new Vector2(MathF.Cos(_planetAngles[i]) * r, MathF.Sin(_planetAngles[i]) * r);
-            if (worldPos.DistanceTo(pos) < ClickThreshold)
+            if (worldPos.DistanceTo(_planetSprites[i].Position) < ClickThreshold)
             {
                 _selectedPlanet  = i;
                 _selectedStation = -1;
@@ -215,7 +228,6 @@ public partial class SystemView : Node2D
                 return;
             }
         }
-
         for (int i = 0; i < _system.Stations.Count; i++)
         {
             int   slot = _system.Planets.Count + i;
@@ -229,7 +241,6 @@ public partial class SystemView : Node2D
                 return;
             }
         }
-
         _selectedPlanet  = -1;
         _selectedStation = -1;
         _infoPanel.Visible = false;
@@ -277,7 +288,7 @@ public partial class SystemView : Node2D
         GetTree().Root.GetNode<Main>("Main").LoadScene(GalaxyMapScene);
 
     // ── HUD ────────────────────────────────────────────────────────────────────
-    private void OnDayPassed(int _day)      => RefreshHUD();
+    private void OnDayPassed(int _day)       => RefreshHUD();
     private void OnCreditsChanged(long _amt) => RefreshHUD();
 
     private void RefreshHUD()
@@ -287,18 +298,50 @@ public partial class SystemView : Node2D
         _lblDay.Text     = $"Day {gs.Day}";
     }
 
-    // ── Helpers ────────────────────────────────────────────────────────────────
-    private (Texture2D sheet, Rect2 region) GetPlanetSprite(PlanetType type) => type switch
+    // ── Shader helpers ─────────────────────────────────────────────────────────
+    private static ShaderMaterial MakeCircleClipMaterial()
     {
-        PlanetType.Terran   => (_planetSheet1, BlueRegion),
-        PlanetType.Ocean    => (_planetSheet2, BlueRegion),
-        PlanetType.Ice      => (_planetSheet1, BlueRegion),
-        PlanetType.Barren   => (_planetSheet1, RockyRegion),
-        PlanetType.Desert   => (_planetSheet2, RockyRegion),
-        PlanetType.Volcanic => (_planetSheet2, RockyRegion),
-        PlanetType.GasGiant => (_planetSheet1, RockyRegion),
-        PlanetType.Toxic    => (_planetSheet2, RockyRegion),
-        _                   => (_planetSheet1, RockyRegion)
+        var shader = new Shader();
+        shader.Code = """
+            shader_type canvas_item;
+            void fragment() {
+                vec4 col = texture(TEXTURE, UV);
+                float dist = length(UV - vec2(0.5));
+                col.a *= 1.0 - smoothstep(0.46, 0.5, dist);
+                COLOR = col;
+            }
+            """;
+        return new ShaderMaterial { Shader = shader };
+    }
+
+    private static ShaderMaterial MakeDarkRemoveMaterial()
+    {
+        var shader = new Shader();
+        shader.Code = """
+            shader_type canvas_item;
+            void fragment() {
+                vec4 col = texture(TEXTURE, UV);
+                float lum = dot(col.rgb, vec3(0.299, 0.587, 0.114));
+                col.a = smoothstep(0.04, 0.10, lum);
+                COLOR = col;
+            }
+            """;
+        return new ShaderMaterial { Shader = shader };
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    private static (Texture2D sheet, Rect2 region) GetPlanetSprite(
+        PlanetType type, Texture2D sheet1, Texture2D sheet2) => type switch
+    {
+        PlanetType.Terran   => (sheet1, BlueRegion),
+        PlanetType.Ocean    => (sheet2, BlueRegion),
+        PlanetType.Ice      => (sheet1, BlueRegion),
+        PlanetType.Barren   => (sheet1, RockyRegion),
+        PlanetType.Desert   => (sheet2, RockyRegion),
+        PlanetType.Volcanic => (sheet2, RockyRegion),
+        PlanetType.GasGiant => (sheet1, RockyRegion),
+        PlanetType.Toxic    => (sheet2, RockyRegion),
+        _                   => (sheet1, RockyRegion)
     };
 
     private static string Capitalize(string s) =>
@@ -314,5 +357,4 @@ public partial class SystemView : Node2D
         StarType.Neutron => new Color(0.68f, 0.28f, 1f),
         _                => new Color(1f,    1f,    1f)
     };
-
 }
