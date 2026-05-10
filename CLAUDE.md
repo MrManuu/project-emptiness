@@ -9,7 +9,14 @@ Für Roadmap, Update Log und Current State → README.md.
 
 2D Top-Down Space Sandbox. Mit einem Schiff starten, Handel treiben, kämpfen, Imperium aufbauen, eigene Fraktion gründen. Lebendiges Universum mit Wirtschaft und Fraktions-KI.
 
-**Referenzspiele:** Starsector (Kampf, Stil), The Last Starship (UI, Innenraum), X4 Foundations (Wirtschaft, Empire)
+Der Kern bleibt ein Space-Sandbox-Spiel, aber der Scope darf bewusst in mehrere Ebenen wachsen:
+- strategische **Galaxy Map**
+- spielbare **System Map** mit echter lokaler Bewegung und Begegnungen
+- **Station Trade / Empire Layer**
+- optional stärkerer **On-Foot Layer** auf Stationen und Planeten
+- später möglich: **planetare Basen**, modulare Stationen, RPG-/Roguelike-Subsysteme
+
+**Referenzspiele:** Starsector (Kampf, Stil), The Last Starship (UI, Innenraum), X4 Foundations (Wirtschaft, Empire), Mount & Blade: Bannerlord (Map-Movement / Encounters), Quasimorph (harte On-Foot-Stimmung als mögliche Station-Referenz)
 
 ---
 
@@ -50,8 +57,10 @@ Data Layer          → JSON-Dateien in /data/, geladen beim Start
 | `SystemView` | ✅ Fertig | Planeten + Stationen in einem System, animiert, klickbar |
 | `StationTrade` | ✅ Fertig | Handelscreen: kaufen/verkaufen, Preise, Lager, Live-Update |
 | `Combat` | 🔲 Next | Echtzeit-Kampf (Starsector-Stil), Waffen, Schilde, Flux |
-| `PlanetView` | 🔲 Geplant | Planet-Landung, Interaktion (Gameplay TBD) |
-| `StationInterior` | 🔲 Später | Schiffs-Innenraum (The Last Starship Querschnitt) |
+| `PlanetView` | 🔲 Geplant | Planet-Landung, Interaktion, evtl. 2D-RPG-/Combat-Layer |
+| `StationInterior` | 🔲 Später | Betretbare Stationen / EVA / möglicher Roguelike- oder Quasimorph-Ton |
+| `StationBuilder` | 🔲 Später | Modulare Stationenbau-Instanz, deren Ergebnis auf der System Map sichtbar wird |
+| `ColonyManagement` | 🔲 Später | Planetare Basis / Gebäudeauswahl / klassischer Colony- oder Kingdom-Management-Layer |
 
 ---
 
@@ -127,6 +136,19 @@ Sprites werden von **Aras** (GPT Image 2) generiert. Alle Sprites sind RGBA 1024
 
 ---
 
+## Scope-Richtung
+
+Diese Punkte sind keine Pflicht für den nächsten Commit, aber Claude soll sie bei Architekturentscheidungen mitdenken:
+
+- **SystemView darf zu einer echten lokalen Karte wachsen**, nicht nur Info-Screen bleiben
+- dort sind später **roaming fleets, interception, pursuit, patrols und freies Bewegen** denkbar
+- **Stationenbau** soll nicht nur abstrakt sein, sondern als **modularer Baukasten** existieren und auf der System Map sichtbar werden
+- **Stationen dürfen begehbar werden**; Innenräume können stärker gameplay-lastig ausfallen als nur Menü-UI
+- **Planet Landing** ist nicht nur Flavor, sondern kann sich zu einem echten On-Foot-Gameplay-System entwickeln
+- **Planetare Basen** dürfen als separater Management-Layer mit einzelnen Gebäuden gedacht werden, nicht nur als Zahlensystem
+
+Wenn Claude neue Systeme plant, dann lieber so strukturieren, dass diese Erweiterungen später anschlussfähig bleiben.
+
 ## Design-Entscheidungen
 
 | Thema | Entscheidung | Begründung |
@@ -136,9 +158,12 @@ Sprites werden von **Aras** (GPT Image 2) generiert. Alle Sprites sind RGBA 1024
 | KI-Simulation | Tick-basiert (1 Tag = 24 Sek) | Performance, kein Frame-Tracking |
 | 3D | Nein, komplett 2D | Top-Down |
 | Grafik-Timing | Erst Mechaniken, dann Sprites | Sprites von Aras (GPT Image 2), parallel zu Mechaniken |
-| Innenraum | The Last Starship Querschnitt-Stil | Monat 3, nach Kampf + Handel |
-| Planet Landing | Geplant für Monat 2 (Tag 15) | Gameplay-Scope noch TBD |
-| **Echtes Fliegen** | **Geplant — nach Core-Loop** | SystemView soll echte Schiffsbewegung bekommen (WASD/Physik auf der System-Map mit Planeten). Aktuell nur Klick-Menü — das ist Placeholder. Kampf später auch direkt in der System-Map möglich. |
+| Innenraum | The Last Starship Querschnitt-Stil / evtl. härterer Station-Gameplay-Layer | Nicht nur Deko, darf mechanisch relevant werden |
+| Planet Landing | Geplant für Monat 2 (Tag 15) | Darf zu vollem On-Foot-System ausgebaut werden |
+| **Echtes Fliegen** | **Geplant — nach Core-Loop** | SystemView soll echte Schiffsbewegung bekommen (WASD/Physik auf der System-Map mit Planeten). Aktuell nur Klick-Menü — Placeholder. |
+| **System Map Encounters** | **Erwünscht** | Roaming fleets, interception, chase, escort, pirate pressure als spätere Weiterentwicklung |
+| **Modularer Stationenbau** | **Erwünscht** | Eigene Bau-Instanz, deren Ergebnis sichtbar und funktional auf der System Map landet |
+| **Planetare Basen** | **Erwünscht** | Einzelne Gebäude, klassischer Colony-/Kingdom-Management-Charakter statt rein abstrakter Prozentwerte |
 
 ---
 
