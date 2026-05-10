@@ -35,18 +35,18 @@ Read this before generating anything new.
 **Resolution:** `512 × 512 px`  
 **Notes:** Planet centered, filling ~80% of canvas. Transparent background outside the sphere. Lit from upper-left (as if the system's star is top-left). No atmosphere rings needed yet.
 
-| Filename | Description |
-|---|---|
-| `planet-barren.png` | Rocky, cratered, grey-brown. Dead moon. No atmosphere. |
-| `planet-desert.png` | Sandy/ochre surface, some rock formations. Thin haze. |
-| `planet-terran.png` | Earth-like. Blue oceans, green/brown landmasses, white clouds. |
-| `planet-ocean.png` | Mostly water. Deep blue with white storm swirls. |
-| `planet-ice.png` | White/pale blue. Frozen surface, cracks, some ice caps. |
-| `planet-volcanic.png` | Dark rock, orange lava cracks glowing, thin red atmosphere. |
-| `planet-gasgiant.png` | Large gas giant, bands of brown/orange/cream, no solid surface visible. |
-| `planet-toxic.png` | Sickly yellow-green, dense cloudy atmosphere, acid haze. |
+| Filename | Status | Description |
+|---|---|---|
+| `planet-barren.png` | ✅ Done | Rocky, cratered, grey-brown. Dead moon. No atmosphere. |
+| `planet-desert.png` | 🔲 Needed | Sandy/ochre surface, some rock formations. Thin haze. |
+| `planet-terran.png` | ✅ Done | Earth-like. Blue oceans, green/brown landmasses, white clouds. |
+| `planet-ocean.png` | 🔲 Needed | Mostly water. Deep blue with white storm swirls. |
+| `planet-ice.png` | ✅ Done | White/pale blue. Frozen surface, cracks, some ice caps. |
+| `planet-volcanic.png` | 🔲 Needed | Dark rock, orange lava cracks glowing, thin red atmosphere. |
+| `planet-gasgiant.png` | 🔲 Needed | Large gas giant, bands of brown/orange/cream, no solid surface visible. |
+| `planet-toxic.png` | 🔲 Needed | Sickly yellow-green, dense cloudy atmosphere, acid haze. |
 
-**Current state:** `assets/concepts/gpt-image-2/pack-01-clean-tactical/` contains planet sheets (2x2 grids, black background) — these are being used with a shader workaround. Individual transparent PNGs would remove the need for the shader.
+**Current state:** Individual transparent PNGs are now live in the game. Shader workarounds removed. Keep delivering the remaining types in the same style.
 
 ---
 
@@ -56,18 +56,18 @@ Read this before generating anything new.
 **Resolution:** `512 × 512 px`  
 **Notes:** Ship centered, pointing **upward** (toward top of canvas). Top-down orthographic view — no perspective foreshortening. Transparent background. Engine glow visible at the bottom (engine exhausts point down). Ships should look like they belong to different size classes.
 
-| Filename | Ship Class | Size hint | Description |
-|---|---|---|---|
-| `ship-shuttle.png` | Shuttle | Tiny | Small, simple, 2-seat craft. Civilian. |
-| `ship-freighter.png` | Freighter | Medium | Blocky cargo hauler. Wide, slow-looking. |
-| `ship-frigate.png` | Frigate | Medium | Fast, lightly armed escort. Sleek. |
-| `ship-destroyer.png` | Destroyer | Medium-large | Military, 2-3 weapon mounts visible. |
-| `ship-cruiser.png` | Cruiser | Large | Heavy warship, thick armor plating. |
-| `ship-battlecruiser.png` | Battlecruiser | Very large | Imposing. Mix of speed and firepower. |
-| `ship-carrier.png` | Carrier | Very large | Flat deck, launch bays visible on sides. |
-| `ship-dreadnought.png` | Dreadnought | Massive | The biggest. Bristling with weapon batteries. |
+| Filename | Status | Ship Class | Size hint | Description |
+|---|---|---|---|---|
+| `ship-shuttle.png` | 🔲 Needed | Shuttle | Tiny | Small, simple, 2-seat craft. Civilian. |
+| `ship-freighter.png` | ✅ Done | Freighter | Medium | Blocky cargo hauler. Wide, slow-looking. |
+| `ship-frigate.png` | ✅ Done | Frigate | Medium | Fast, lightly armed escort. Sleek. |
+| `ship-destroyer.png` | ✅ Done | Destroyer | Medium-large | Military, 2-3 weapon mounts visible. |
+| `ship-cruiser.png` | 🔲 Needed | Cruiser | Large | Heavy warship, thick armor plating. |
+| `ship-battlecruiser.png` | 🔲 Needed | Battlecruiser | Very large | Imposing. Mix of speed and firepower. |
+| `ship-carrier.png` | 🔲 Needed | Carrier | Very large | Flat deck, launch bays visible on sides. |
+| `ship-dreadnought.png` | 🔲 Needed | Dreadnought | Massive | The biggest. Bristling with weapon batteries. |
 
-**Current state:** `assets/concepts/gpt-image-2/pack-01-clean-tactical/ship-01.png` is a good freighter/frigate-scale reference. Continue in that style.
+**Current state:** freighter/frigate/destroyer are live in the codebase. Continue in the same style for the remaining classes.
 
 ---
 
@@ -90,14 +90,14 @@ Ships will eventually come in faction color variants. For now generate neutral/g
 **Resolution:** `1920 × 1080 px` (16:9)  
 **Notes:** Full scene backgrounds. These tile behind the game world. No alpha needed (full opaque images). Should be dark enough that UI text and game objects remain readable on top.
 
-| Filename | Description |
-|---|---|
-| `bg-nebula-blue.png` | Cold blue/purple deep space nebula. Our main background. |
-| `bg-nebula-warm.png` | Warm orange/amber nebula. For systems near active stars. |
-| `bg-deep-space.png` | Near-black, minimal. Just stars. For void/empty regions. |
-| `bg-combat.png` | Slightly denser, more dramatic. Used during combat scenes. |
+| Filename | Status | Description |
+|---|---|---|
+| `bg-nebula-blue.png` | ✅ Done | Cold blue/purple deep space nebula. Our main background. |
+| `bg-nebula-warm.png` | ✅ Done | Warm orange/amber nebula. For systems near active stars. |
+| `bg-deep-space.png` | ✅ Done | Near-black, minimal. Just stars. For void/empty regions. |
+| `bg-combat.png` | 🔲 Needed | Slightly denser, more dramatic. Used during combat scenes. |
 
-**Current state:** `assets/concepts/gpt-image-2/pack-02-painterly-probe/background-01.png` is a 1024×1024 painterly nebula, used as-is but stretched. A proper 1920×1080 version in the same style would be ideal.
+**Current state:** Three backgrounds delivered and wired up. bg-combat needed once combat scene is implemented (Month 2).
 
 ---
 
@@ -118,11 +118,16 @@ Ships will eventually come in faction color variants. For now generate neutral/g
 
 ---
 
-## What's Already Usable
+## What's Live in the Game
 
-| File | Status | Notes |
-|---|---|---|
-| `concepts/gpt-image-2/pack-01-clean-tactical/ship-01.png` | ✅ In use | Good freighter. Keep this style. |
-| `concepts/gpt-image-2/pack-01-clean-tactical/planet-01.png` | ⚠️ Workaround | 2x2 grid, shader applied. Replace with individual files. |
-| `concepts/gpt-image-2/pack-01-clean-tactical/planet-02.png` | ⚠️ Workaround | Same issue. |
-| `concepts/gpt-image-2/pack-02-painterly-probe/background-01.png` | ✅ In use | Good nebula. 1920×1080 version needed. |
+| File | Notes |
+|---|---|
+| `backgrounds/bg-nebula-blue.png` | ✅ Active — Galaxy Map + System View main background |
+| `backgrounds/bg-nebula-warm.png` | ✅ Delivered — will be used for warm-star systems |
+| `backgrounds/bg-deep-space.png` | ✅ Delivered — will be used for void/independent systems |
+| `planets/planet-barren.png` | ✅ Active — default fallback + Barren type |
+| `planets/planet-terran.png` | ✅ Active — auto-loaded for Terran planets |
+| `planets/planet-ice.png` | ✅ Active — auto-loaded for Ice planets |
+| `ships/ship-freighter.png` | ✅ Active — player ship in System View |
+| `ships/ship-frigate.png` | ✅ Delivered — will be used for NPC ships |
+| `ships/ship-destroyer.png` | ✅ Delivered — will be used for NPC ships |
