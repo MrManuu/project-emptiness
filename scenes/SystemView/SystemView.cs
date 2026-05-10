@@ -12,6 +12,8 @@ public partial class SystemView : Node2D
 {
     private static readonly PackedScene GalaxyMapScene =
         GD.Load<PackedScene>("res://scenes/GalaxyMap/GalaxyMap.tscn");
+    private static readonly PackedScene StationTradeScene =
+        GD.Load<PackedScene>("res://scenes/StationTrade/StationTrade.tscn");
 
     private const float StarRadius       = 40f;
     private const float PlanetSpriteHalf = 22f;
@@ -36,6 +38,7 @@ public partial class SystemView : Node2D
     private float[]    _stationAngles = Array.Empty<float>();
     private int        _selectedPlanet  = -1;
     private int        _selectedStation = -1;
+    private Station?   _dockedStation;
 
     // UI
     private Label   _lblSystemTitle = null!;
@@ -255,6 +258,7 @@ public partial class SystemView : Node2D
 
     private void ShowStationInfo(Station s)
     {
+        _dockedStation = s;
         var faction = GameState.Instance.GetFaction(s.FactionId);
         _lblObjectName.Text = s.Name;
         var sb = new StringBuilder();
@@ -275,7 +279,12 @@ public partial class SystemView : Node2D
         _infoPanel.Visible = true;
     }
 
-    private void OnDockPressed() { /* Day 3: open StationTrade */ }
+    private void OnDockPressed()
+    {
+        if (_dockedStation == null) return;
+        GameState.Instance.CurrentStation = _dockedStation;
+        GetTree().Root.GetNode<Main>("Main").LoadScene(StationTradeScene);
+    }
 
     private void OnBackPressed() =>
         GetTree().Root.GetNode<Main>("Main").LoadScene(GalaxyMapScene);

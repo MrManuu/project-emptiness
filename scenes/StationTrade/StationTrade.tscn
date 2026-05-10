@@ -1,0 +1,132 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/StationTrade/StationTrade.cs" id="1_stationtrade"]
+
+[node name="StationTrade" type="Node2D"]
+script = ExtResource("1_stationtrade")
+
+[node name="Background" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="BgRect" type="TextureRect" parent="Background"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+expand_mode = 1
+stretch_mode = 6
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Root" type="VBoxContainer" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="TopBar" type="PanelContainer" parent="UI/Root"]
+layout_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="UI/Root/TopBar"]
+layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 12
+
+[node name="BackBtn" type="Button" parent="UI/Root/TopBar/HBox"]
+layout_mode = 2
+text = "◀  System View"
+theme_override_font_sizes/font_size = 13
+
+[node name="StationTitle" type="Label" parent="UI/Root/TopBar/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+text = "Station Name"
+theme_override_font_sizes/font_size = 13
+
+[node name="CargoLabel" type="Label" parent="UI/Root/TopBar/HBox"]
+layout_mode = 2
+horizontal_alignment = 2
+text = "Cargo: 0/200"
+theme_override_font_sizes/font_size = 13
+
+[node name="CreditsLabel" type="Label" parent="UI/Root/TopBar/HBox"]
+layout_mode = 2
+horizontal_alignment = 2
+text = "Credits: 50,000"
+theme_override_font_sizes/font_size = 13
+
+[node name="Body" type="HBoxContainer" parent="UI/Root"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 2
+
+[node name="BuyPanel" type="PanelContainer" parent="UI/Root/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BuyVBox" type="VBoxContainer" parent="UI/Root/Body/BuyPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 8.0
+offset_right = -12.0
+offset_bottom = -8.0
+theme_override_constants/separation = 6
+
+[node name="BuyTitle" type="Label" parent="UI/Root/Body/BuyPanel/BuyVBox"]
+layout_mode = 2
+text = "Station Stock"
+theme_override_font_sizes/font_size = 15
+
+[node name="BuySep" type="HSeparator" parent="UI/Root/Body/BuyPanel/BuyVBox"]
+layout_mode = 2
+
+[node name="BuyScroll" type="ScrollContainer" parent="UI/Root/Body/BuyPanel/BuyVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="BuyList" type="VBoxContainer" parent="UI/Root/Body/BuyPanel/BuyVBox/BuyScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="SellPanel" type="PanelContainer" parent="UI/Root/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SellVBox" type="VBoxContainer" parent="UI/Root/Body/SellPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 8.0
+offset_right = -12.0
+offset_bottom = -8.0
+theme_override_constants/separation = 6
+
+[node name="SellTitle" type="Label" parent="UI/Root/Body/SellPanel/SellVBox"]
+layout_mode = 2
+text = "Your Cargo"
+theme_override_font_sizes/font_size = 15
+
+[node name="SellSep" type="HSeparator" parent="UI/Root/Body/SellPanel/SellVBox"]
+layout_mode = 2
+
+[node name="SellScroll" type="ScrollContainer" parent="UI/Root/Body/SellPanel/SellVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="SellList" type="VBoxContainer" parent="UI/Root/Body/SellPanel/SellVBox/SellScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4

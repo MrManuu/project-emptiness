@@ -20,10 +20,13 @@ public partial class GameState : Node
     // Game time
     public int Day { get; set; } = 1;
 
+    public Station? CurrentStation { get; set; }
+
     // Signals
     [Signal] public delegate void SystemChangedEventHandler(int newSystemId);
     [Signal] public delegate void CreditsChangedEventHandler(long newAmount);
     [Signal] public delegate void DayPassedEventHandler(int day);
+    [Signal] public delegate void CargoChangedEventHandler();
 
     public override void _Ready()
     {
@@ -129,5 +132,44 @@ public partial class GameState : Node
     {
         PlayerShip.Credits += amount;
         EmitSignal(SignalName.CreditsChanged, PlayerShip.Credits);
+    }
+
+    public bool BuyGood(string goodId, int qty)
+    {
+        if (CurrentStation == null || qty <= 0) return false;
+        if (!CurrentStation.Stock.ContainsKey(goodId) || CurrentStation.Stock[goodId] < qty) return false;
+
+        float unitPrice = CurrentStation.Prices.ContainsKey(goodId) ? CurrentStation.Prices[goodId] : 0f;
+        long cost = (long)MathF.Ceiling(unitPrice * qty);
+        if (PlayerShip.Credits < cost) return false;
+        if (!PlayerShip.CanCarry(qty)) return false;
+
+        CurrentStation.Stock[goodId] -= qty;
+        PlayerShip.Credits -= cost;
+        if (!PlayerShip.Cargo.ContainsKey(goodId)) PlayerShip.Cargo[goodId] = 0;
+        PlayerShip.Cargo[goodId] += qty;
+
+        EmitSignal(SignalName.CreditsChanged, PlayerShip.Credits);
+        EmitSignal(SignalName.CargoChanged);
+        return true;
+    }
+
+    public bool SellGood(string goodId, int qty)
+    {
+        if (CurrentStation == null || qty <= 0) return false;
+        if (!PlayerShip.Cargo.ContainsKey(goodId) || PlayerShip.Cargo[goodId] < qty) return false;
+
+        float unitPrice = CurrentStation.Prices.ContainsKey(goodId) ? CurrentStation.Prices[goodId] : 0f;
+        long revenue = (long)(unitPrice * qty);
+
+        PlayerShip.Cargo[goodId] -= qty;
+        if (PlayerShip.Cargo[goodId] == 0) PlayerShip.Cargo.Remove(goodId);
+        if (!CurrentStation.Stock.ContainsKey(goodId)) CurrentStation.Stock[goodId] = 0;
+        CurrentStation.Stock[goodId] += qty;
+        PlayerShip.Credits += revenue;
+
+        EmitSignal(SignalName.CreditsChanged, PlayerShip.Credits);
+        EmitSignal(SignalName.CargoChanged);
+        return true;
     }
 }
