@@ -138,6 +138,7 @@ Sprites werden von **Aras** (GPT Image 2) generiert. Alle Sprites sind RGBA 1024
 | Grafik-Timing | Erst Mechaniken, dann Sprites | Sprites von Aras (GPT Image 2), parallel zu Mechaniken |
 | Innenraum | The Last Starship Querschnitt-Stil | Monat 3, nach Kampf + Handel |
 | Planet Landing | Geplant für Monat 2 (Tag 15) | Gameplay-Scope noch TBD |
+| **Echtes Fliegen** | **Geplant — nach Core-Loop** | SystemView soll echte Schiffsbewegung bekommen (WASD/Physik auf der System-Map mit Planeten). Aktuell nur Klick-Menü — das ist Placeholder. Kampf später auch direkt in der System-Map möglich. |
 
 ---
 
