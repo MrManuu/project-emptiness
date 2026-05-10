@@ -22,6 +22,49 @@ The universe runs without you. Factions expand, trade, and go to war. Prices flu
 
 ---
 
+## Possible Scope Expansions
+
+These are active design directions currently under consideration. They are not all locked for the next build, but they describe where the project could grow beyond the current galaxy-map-first prototype.
+
+### 1. System Map as a Playable Local Space Layer
+Instead of remaining a mostly informational scene, the **System View** could evolve into a more dynamic local-space layer with **Mount & Blade: Bannerlord-style movement**:
+- fleets, traders, pirates, patrols, and stations moving in real time on the system map
+- the player traveling freely inside the system instead of only clicking static objects
+- encounters triggered by proximity, pursuit, interception, or escort behavior
+- system geography becoming strategically relevant, not just decorative
+
+### 2. Modular Station Construction
+Station building could become a major empire feature:
+- build stations in their own construction/management instance
+- finished stations appear physically on the system map
+- stations assembled **module by module** rather than as one fixed prefab
+- modules could include cargo, refinery, habitation, defense, ship services, trade, research, and production
+- station layout would affect both function and visual identity
+
+### 3. Stations as Walkable / Boardable Spaces
+Stations may eventually be enterable in person via **spacesuit / EVA / docked traversal**:
+- board stations and move through them directly
+- gameplay tone could lean toward **roguelike** or **Quasimorph-style** exploration
+- station interiors could support combat, looting, quests, faction events, sabotage, survival pressure, or social interaction
+- this would add a strong on-foot layer to what is currently a strategic space sandbox
+
+### 4. Planet Landing and On-Foot Gameplay
+Planets are planned to become more than resource nodes:
+- land on planets and move around as a character
+- possible presentation: **2D RPG-style exploration**, **Warsim-/combat-heavy encounters**, or a hybrid of both
+- colonized worlds, ruins, hostile fauna, raiders, and faction activity could all become gameplay spaces
+- planetary visits could tie together narrative, resources, survival, and combat
+
+### 5. Planetary Base / Colony Management
+Planet-side empire building is also on the table:
+- establish and upgrade a planetary base
+- choose individual buildings rather than only abstract percentages
+- use a more classic **kingdom-management / colony-management** approach
+- buildings could affect income, production, population, defense, logistics, and political stability
+- this would connect local on-planet gameplay with broader faction and economic strategy
+
+---
+
 ## Inspirations
 
 | Game | What we take |
@@ -99,11 +142,18 @@ The universe runs without you. Factions expand, trade, and go to war. Prices flu
 - [ ] Day 11-12: Faction AI — autonomous expansion, trade, war declarations
 - [ ] Day 13: Found your own faction
 - [ ] Day 14: Empire overview — your systems, income, fleets
-- [ ] Day 15: Planet landing — explore, extract resources, colony interaction *(gameplay scope TBD)*
-- [ ] Day 16: First graphics pass — remaining ship classes + faction color variants (Aras/GPT Image 2)
+<<<<<<< HEAD
+- [ ] Day 15: Planet landing — explore, extract resources, colony interaction *(may expand into full on-foot RPG/combat layer)*
+- [ ] Day 16: First graphics pass — remaining ship classes, faction color variants, and asset production pipeline (Aras / GPT Image 2)
 - [ ] Day 17-18: Weapon effects and explosions (shaders + particles)
 - [ ] Day 19: Ship upgrade system
 - [ ] Day 20: Combat polish — flux system, shields, tactics
+
+### Longer-Term Expansion Paths
+- [ ] System-view free movement with roaming fleets and interception gameplay
+- [ ] Modular station construction visible directly on the system map
+- [ ] Walkable stations / EVA boarding with roguelike or Quasimorph-like loops
+- [ ] Planet-side base building with individual structures and colony management
 
 ### Month 3 — Content & Polish
 - [ ] Day 21-22: More ship classes (8+), more goods, random events
