@@ -14,18 +14,17 @@ public partial class SystemView : Node2D
         GD.Load<PackedScene>("res://scenes/GalaxyMap/GalaxyMap.tscn");
 
     private const float StarRadius       = 40f;
-    private const float PlanetSpriteHalf = 20f;
+    private const float PlanetSpriteHalf = 22f;
     private const float StationHalf      = 8f;
-    private const float ClickThreshold   = 22f;
-
-    private static readonly Rect2 RockyRegion = new(0f,   512f, 512f, 512f);
-    private static readonly Rect2 BlueRegion  = new(512f, 512f, 512f, 512f);
+    private const float ClickThreshold   = 24f;
 
     private static readonly float[] OrbitRadii  = { 130f, 210f, 300f, 400f, 510f, 630f };
     private static readonly float[] OrbitSpeeds = { 0.18f, 0.13f, 0.09f, 0.065f, 0.048f, 0.036f };
 
     private static readonly Color OrbitColor = new(1f, 1f, 1f, 0.06f);
     private static readonly Color TextColor  = new(0.75f, 0.8f, 0.95f, 0.65f);
+
+    private const string FallbackPlanetPath = "res://assets/planets/planet-barren.png";
 
     // Planet Sprite2D nodes (positioned each frame)
     private Sprite2D[] _planetSprites = Array.Empty<Sprite2D>();
@@ -54,35 +53,29 @@ public partial class SystemView : Node2D
 
         // Background
         var bgRect = GetNode<TextureRect>("Background/BgRect");
-        bgRect.Texture  = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-02-painterly-probe/background-01.png");
-        bgRect.Modulate = new Color(0.6f, 0.55f, 0.7f, 1f);
+        bgRect.Texture  = GD.Load<Texture2D>("res://assets/backgrounds/bg-nebula-blue.png");
+        bgRect.Modulate = new Color(1f, 1f, 1f, 1f);
 
-        // Planet sprites with circular clip shader
-        var sheet1 = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-01-clean-tactical/planet-01.png");
-        var sheet2 = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-01-clean-tactical/planet-02.png");
-        var circleMat = MakeCircleClipMaterial();
-
+        // Planet sprites — load individual PNGs, fall back to barren
+        float planetScale = PlanetSpriteHalf * 2f / 1024f;
         _planetSprites = new Sprite2D[_system.Planets.Count];
         for (int i = 0; i < _system.Planets.Count; i++)
         {
-            var (sheet, region) = GetPlanetSprite(_system.Planets[i].Type, sheet1, sheet2);
-            var atlas = new AtlasTexture { Atlas = sheet, Region = region };
+            string path = GetPlanetPath(_system.Planets[i].Type);
             var sprite = new Sprite2D
             {
-                Texture  = atlas,
-                Scale    = new Vector2(PlanetSpriteHalf * 2f / 512f, PlanetSpriteHalf * 2f / 512f),
-                Material = circleMat,
-                ZIndex   = 1
+                Texture = GD.Load<Texture2D>(path),
+                Scale   = new Vector2(planetScale, planetScale),
+                ZIndex  = 1
             };
             AddChild(sprite);
             _planetSprites[i] = sprite;
         }
 
-        // Player ship with dark-remove shader
+        // Player ship — transparent PNG, no shader needed
         var ship = GetNode<Sprite2D>("PlayerShip");
-        ship.Texture  = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-01-clean-tactical/ship-01.png");
-        ship.Scale    = new Vector2(0.055f, 0.055f);
-        ship.Material = MakeDarkRemoveMaterial();
+        ship.Texture = GD.Load<Texture2D>("res://assets/ships/ship-freighter.png");
+        ship.Scale   = new Vector2(0.05f, 0.05f);
 
         // Orbit angles
         int p = _system.Planets.Count;
@@ -164,7 +157,7 @@ public partial class SystemView : Node2D
                 0, Mathf.Tau, 64, new Color(0.8f, 0.8f, 0.5f, 0.05f), 1f, true);
         }
 
-        // Planet selection ring + label (planet disc rendered by Sprite2D node)
+        // Planet selection ring + label
         for (int i = 0; i < _system.Planets.Count; i++)
         {
             var pos = _planetSprites[i].Position;
@@ -298,51 +291,23 @@ public partial class SystemView : Node2D
         _lblDay.Text     = $"Day {gs.Day}";
     }
 
-    // ── Shader helpers ─────────────────────────────────────────────────────────
-    private static ShaderMaterial MakeCircleClipMaterial()
-    {
-        var shader = new Shader();
-        shader.Code = """
-            shader_type canvas_item;
-            void fragment() {
-                vec4 col = texture(TEXTURE, UV);
-                float dist = length(UV - vec2(0.5));
-                col.a *= 1.0 - smoothstep(0.46, 0.5, dist);
-                COLOR = col;
-            }
-            """;
-        return new ShaderMaterial { Shader = shader };
-    }
-
-    private static ShaderMaterial MakeDarkRemoveMaterial()
-    {
-        var shader = new Shader();
-        shader.Code = """
-            shader_type canvas_item;
-            void fragment() {
-                vec4 col = texture(TEXTURE, UV);
-                float lum = dot(col.rgb, vec3(0.299, 0.587, 0.114));
-                col.a = smoothstep(0.04, 0.10, lum);
-                COLOR = col;
-            }
-            """;
-        return new ShaderMaterial { Shader = shader };
-    }
-
     // ── Helpers ────────────────────────────────────────────────────────────────
-    private static (Texture2D sheet, Rect2 region) GetPlanetSprite(
-        PlanetType type, Texture2D sheet1, Texture2D sheet2) => type switch
+    private static string GetPlanetPath(PlanetType type)
     {
-        PlanetType.Terran   => (sheet1, BlueRegion),
-        PlanetType.Ocean    => (sheet2, BlueRegion),
-        PlanetType.Ice      => (sheet1, BlueRegion),
-        PlanetType.Barren   => (sheet1, RockyRegion),
-        PlanetType.Desert   => (sheet2, RockyRegion),
-        PlanetType.Volcanic => (sheet2, RockyRegion),
-        PlanetType.GasGiant => (sheet1, RockyRegion),
-        PlanetType.Toxic    => (sheet2, RockyRegion),
-        _                   => (sheet1, RockyRegion)
-    };
+        string path = type switch
+        {
+            PlanetType.Barren   => "res://assets/planets/planet-barren.png",
+            PlanetType.Desert   => "res://assets/planets/planet-desert.png",
+            PlanetType.Terran   => "res://assets/planets/planet-terran.png",
+            PlanetType.Ocean    => "res://assets/planets/planet-ocean.png",
+            PlanetType.Ice      => "res://assets/planets/planet-ice.png",
+            PlanetType.Volcanic => "res://assets/planets/planet-volcanic.png",
+            PlanetType.GasGiant => "res://assets/planets/planet-gasgiant.png",
+            PlanetType.Toxic    => "res://assets/planets/planet-toxic.png",
+            _                   => FallbackPlanetPath
+        };
+        return ResourceLoader.Exists(path) ? path : FallbackPlanetPath;
+    }
 
     private static string Capitalize(string s) =>
         s.Length == 0 ? s : char.ToUpper(s[0]) + s[1..];
