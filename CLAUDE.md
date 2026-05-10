@@ -83,9 +83,9 @@ Project Emptiness/
 ├── assets/
 │   ├── FOR_ARAS.md            ← Asset-Brief für Aras (Specs, Dateinamen, Format)
 │   ├── concepts/              ← KI-generierte Konzept-Referenzen (nicht final)
-│   ├── planets/               ← 🔲 Wartet auf Aras (512×512, transparent PNG)
-│   ├── ships/                 ← 🔲 Wartet auf Aras (512×512, transparent PNG)
-│   └── backgrounds/           ← 🔲 Wartet auf Aras (1920×1080 PNG)
+│   ├── planets/               ← ✅ barren, terran, ice — 🔲 desert, ocean, volcanic, gasgiant, toxic
+│   ├── ships/                 ← ✅ freighter, frigate, destroyer — 🔲 shuttle, cruiser, battlecruiser, carrier, dreadnought
+│   └── backgrounds/           ← ✅ bg-nebula-blue, bg-nebula-warm, bg-deep-space — 🔲 bg-combat
 └── data/
     ├── factions.json           ← 5 Fraktionen
     └── goods.json              ← 10 Handelswaren
@@ -107,25 +107,23 @@ Project Emptiness/
 
 ## Asset-Pipeline
 
-Sprites werden von **Aras** (GPT Image 2) generiert, nicht Midjourney.
+Sprites werden von **Aras** (GPT Image 2) generiert. Alle Sprites sind RGBA 1024×1024, Hintergründe opaque.
 
 | Status | Beschreibung |
 |---|---|
-| ✅ In Betrieb | Nebula-Hintergrund (`pack-02/background-01.png`) in beiden Szenen |
-| ✅ In Betrieb | Ship-Sprite (`ship-01.png`) in SystemView, Shader entfernt schwarzen Hintergrund |
-| ⚠️ Workaround | Planet-Sprites aus 2×2-Sheets via AtlasTexture + Kreisclip-Shader — funktioniert nicht perfekt |
-| 🔲 Ausstehend | Einzelne Planet-PNGs mit transparentem Hintergrund (lt. `assets/FOR_ARAS.md`) |
-| 🔲 Ausstehend | Alle Schiffsklassen, Hintergrund 1920×1080, Stationen |
+| ✅ In Betrieb | `bg-nebula-blue.png` — Haupthintergrund in Galaxy Map + System View |
+| ✅ In Betrieb | `bg-nebula-warm.png`, `bg-deep-space.png` — geliefert, noch nicht per System zugewiesen |
+| ✅ In Betrieb | `ship-freighter.png` — Spielerschiff in System View, kein Shader |
+| ✅ In Betrieb | `planet-barren.png`, `planet-terran.png`, `planet-ice.png` — live, auto-geladen nach PlanetType |
+| ⚠️ Fallback | `planet-desert/ocean/volcanic/gasgiant/toxic` → zeigen barren-Sprite bis Aras liefert |
+| 🔲 Ausstehend | `ship-shuttle/cruiser/battlecruiser/carrier/dreadnought.png` |
+| 🔲 Ausstehend | `bg-combat.png` (erst für Day 4-5 Combat benötigt) |
+| 🔲 Ausstehend | Alpha-Kanten verfeinern (leichter dunkler Rand sichtbar, Aras-Feedback) |
 
 **Wenn Aras neue Assets liefert:**
-1. Dateien in `assets/planets/`, `assets/ships/`, `assets/backgrounds/` ablegen (Dateinamen exakt lt. Brief)
-2. In `SystemView.cs`: Dateipfade anpassen, Shader-Logik entfernen
-3. Kein sonstiger Code-Umbau nötig — Struktur ist bereits vorbereitet
-
-**Shader-Workaround (aktuell):**
-- Planeten: GLSL-Kreisclip-Shader auf `Sprite2D`-Nodes mit `AtlasTexture` — klappt teilweise
-- Schiff: Luminanz-basierter Alpha-Shader — klappt gut
-- Sobald transparente PNGs da sind: Shader entfernen, direkt laden
+1. Dateien in `assets/planets/`, `assets/ships/`, `assets/backgrounds/` ablegen (exakte Dateinamen lt. Brief)
+2. Kein Code-Umbau nötig — `GetPlanetPath()` in `SystemView.cs` lädt automatisch per `PlanetType`
+3. `ResourceLoader.Exists()` Fallback auf `planet-barren.png` ist bereits aktiv
 
 ---
 
@@ -147,7 +145,7 @@ Sprites werden von **Aras** (GPT Image 2) generiert, nicht Midjourney.
 
 - **Hintergrund:** `Color(0.02, 0.02, 0.055)` — fast schwarz, Blaustich
 - **Sternfarben:** Yellow `#FFD938`, Orange `#FF8C1F`, Red `#EB3A2E`, Blue `#4794FF`, White `#EDF0FF`, Neutron `#AE47FF`
-- **Planeten:** aktuell Sprite-basiert (AI-generiert, Shader-Workaround) → werden durch transparente PNGs von Aras ersetzt
+- **Planeten:** RGBA transparent PNGs von Aras (1024×1024), barren/terran/ice live — Rest Fallback auf barren
 - **Fraktionsfarben:** Terran `#4577FF`, Syndicate `#FF4D26`, Void `#A640FF`, Alliance `#33E573`
 - **UI:** Dunkle Panels, helle Labels, Sci-Fi-minimalistisch
 - **Font:** Godot FallbackFont jetzt → Sci-Fi Monospace Font in Monat 3

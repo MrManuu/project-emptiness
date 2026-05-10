@@ -34,8 +34,9 @@ Read this before generating anything new.
 ## Planets
 
 **Folder:** `assets/planets/`  
-**Resolution:** `512 × 512 px`  
-**Notes:** Planet centered, filling ~80% of canvas. Transparent background outside the sphere. Lit from upper-left (as if the system's star is top-left). No atmosphere rings needed yet.
+**Resolution:** `1024 × 1024 px`  
+**Notes:** Planet centered, filling ~80% of canvas. Transparent background outside the sphere. Lit from upper-left (as if the system's star is top-left). No atmosphere rings needed yet.  
+**Edge quality:** Please use soft/feathered alpha edges around the planet — avoid a hard pixel-perfect cutout. A 2–4px soft falloff on the edge blends much better onto the space background.
 
 | Filename | Status | Description |
 |---|---|---|
@@ -55,8 +56,8 @@ Read this before generating anything new.
 ## Ships
 
 **Folder:** `assets/ships/`  
-**Resolution:** `512 × 512 px`  
-**Notes:** Ship centered, pointing **upward** (toward top of canvas). Top-down orthographic view — no perspective foreshortening. Transparent background. Engine glow visible at the bottom (engine exhausts point down). Ships should look like they belong to different size classes.
+**Resolution:** `1024 × 1024 px`  
+**Notes:** Ship centered, pointing **upward** (toward top of canvas). Top-down orthographic view — no perspective foreshortening. Transparent background with soft alpha edges. Engine glow visible at the bottom (engine exhausts point down). Ships should look like they belong to different size classes.
 
 | Filename | Status | Ship Class | Size hint | Description |
 |---|---|---|---|---|
