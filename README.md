@@ -58,7 +58,7 @@ The universe runs without you. Factions expand, trade, and go to war. Prices flu
 
 ## Current State
 
-**Day 2 complete — System View + Asset Integration**
+**Day 3 complete — Station Trade Screen**
 
 ### What's playable
 - 64 procedurally generated star systems across 4 faction territories
@@ -66,17 +66,19 @@ The universe runs without you. Factions expand, trade, and go to war. Prices flu
 - **System view:** enter any system — see orbiting planets (animated) and stations
 - Click planets → type, population, resources
 - Click stations → faction, goods inventory with live prices
+- **Station trade screen:** dock at any station — buy and sell goods, live prices, cargo tracking
+- Trade arbitrage: buy cheap in one system, sell expensive in another
 - Live economy: station prices fluctuate daily with supply and demand
 - HUD: credits, current day, current location
 
 ### What it looks like
-- Nebula background (painterly deep space) in both galaxy map and system view
+- Nebula background (painterly deep space) in all scenes
 - Stars colored by type: yellow, orange, red, blue, white, neutron (purple)
 - Faction territory shown as colored glows around stars
 - Hyperlane network connecting all systems
-- AI-generated planet sprites (barren, terran, ice) — transparent PNGs, no shader workaround
-- Player ship sprite (freighter class) — transparent PNG, composited cleanly onto background
-- Remaining planet types (desert, ocean, volcanic, gas giant, toxic) fall back to barren sprite until Aras delivers them
+- AI-generated planet sprites (barren, terran, ice) — transparent PNGs composited cleanly
+- Player ship sprite (freighter class) — transparent PNG
+- Remaining planet types fall back to barren sprite until Aras delivers them
 
 ---
 
@@ -85,7 +87,7 @@ The universe runs without you. Factions expand, trade, and go to war. Prices flu
 ### Month 1 — Gameplay Foundation
 - [x] Day 1: Galaxy map, navigation, factions, economy simulation
 - [x] Day 2: System view — orbiting planets and stations, click info
-- [ ] Day 3: Station trade screen — buy and sell goods
+- [x] Day 3: Station trade screen — buy/sell goods, cargo tracking, live prices
 - [ ] Day 4-5: Real-time combat — first ship battle
 - [ ] Day 6: Fleet management — buy and command 2-5 ships
 - [ ] Day 7: Faction reputation — consequences for your actions
@@ -135,6 +137,14 @@ The universe runs without you. Factions expand, trade, and go to war. Prices flu
 ---
 
 ## Update Log
+
+### 2026-05-10 — Day 3: Station Trade Screen
+- Dock button in System View navigates to trade screen
+- Two-panel layout: Station Stock (buy) + Your Cargo (sell)
+- Buy 1 / Max buttons with credit + cargo space validation
+- Sell 1 / Sell All with total value preview
+- Live price updates via existing economy simulation
+- CargoChanged signal added to GameState for live UI refresh
 
 ### 2026-05-10 — Asset Integration (final)
 - Aras delivered proper RGBA transparent PNGs (1024×1024): barren, terran, ice planets + freighter, frigate, destroyer ships

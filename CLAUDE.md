@@ -48,9 +48,9 @@ Data Layer          → JSON-Dateien in /data/, geladen beim Start
 |---|---|---|
 | `GalaxyMap` | ✅ Fertig | Galaxie-Übersicht, Pan/Zoom, Navigation, Info-Panel, HUD |
 | `SystemView` | ✅ Fertig | Planeten + Stationen in einem System, animiert, klickbar |
+| `StationTrade` | ✅ Fertig | Handelscreen: kaufen/verkaufen, Preise, Lager, Live-Update |
+| `Combat` | 🔲 Next | Echtzeit-Kampf (Starsector-Stil), Waffen, Schilde, Flux |
 | `PlanetView` | 🔲 Geplant | Planet-Landung, Interaktion (Gameplay TBD) |
-| `StationTrade` | 🔲 Next | Handelscreen: kaufen/verkaufen, Preise, Lager |
-| `Combat` | 🔲 Geplant | Echtzeit-Kampf (Starsector-Stil), Waffen, Schilde, Flux |
 | `StationInterior` | 🔲 Später | Schiffs-Innenraum (The Last Starship Querschnitt) |
 
 ---
@@ -65,8 +65,8 @@ Project Emptiness/
 │   ├── Main/                  ← Entry Point (lädt erste Szene)
 │   ├── GalaxyMap/             ← ✅ Fertig
 │   ├── SystemView/            ← ✅ Fertig
-│   ├── StationTrade/          ← 🔲 Next
-│   ├── Combat/                ← 🔲 Geplant
+│   ├── StationTrade/          ← ✅ Fertig
+│   ├── Combat/                ← 🔲 Next
 │   └── StationInterior/       ← 🔲 Später
 ├── src/
 │   ├── Core/GameState.cs      ← Singleton, Signals, Spielzustand
