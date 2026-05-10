@@ -80,6 +80,12 @@ Project Emptiness/
 │   │   └── GalaxyGenerator.cs ← 64 Systeme, Planeten, Stationen, Fraktionen
 │   └── Simulation/
 │       └── SimulationManager.cs ← Wirtschaft + Diplomatie-Drift
+├── assets/
+│   ├── FOR_ARAS.md            ← Asset-Brief für Aras (Specs, Dateinamen, Format)
+│   ├── concepts/              ← KI-generierte Konzept-Referenzen (nicht final)
+│   ├── planets/               ← 🔲 Wartet auf Aras (512×512, transparent PNG)
+│   ├── ships/                 ← 🔲 Wartet auf Aras (512×512, transparent PNG)
+│   └── backgrounds/           ← 🔲 Wartet auf Aras (1920×1080 PNG)
 └── data/
     ├── factions.json           ← 5 Fraktionen
     └── goods.json              ← 10 Handelswaren
@@ -99,6 +105,30 @@ Project Emptiness/
 
 ---
 
+## Asset-Pipeline
+
+Sprites werden von **Aras** (GPT Image 2) generiert, nicht Midjourney.
+
+| Status | Beschreibung |
+|---|---|
+| ✅ In Betrieb | Nebula-Hintergrund (`pack-02/background-01.png`) in beiden Szenen |
+| ✅ In Betrieb | Ship-Sprite (`ship-01.png`) in SystemView, Shader entfernt schwarzen Hintergrund |
+| ⚠️ Workaround | Planet-Sprites aus 2×2-Sheets via AtlasTexture + Kreisclip-Shader — funktioniert nicht perfekt |
+| 🔲 Ausstehend | Einzelne Planet-PNGs mit transparentem Hintergrund (lt. `assets/FOR_ARAS.md`) |
+| 🔲 Ausstehend | Alle Schiffsklassen, Hintergrund 1920×1080, Stationen |
+
+**Wenn Aras neue Assets liefert:**
+1. Dateien in `assets/planets/`, `assets/ships/`, `assets/backgrounds/` ablegen (Dateinamen exakt lt. Brief)
+2. In `SystemView.cs`: Dateipfade anpassen, Shader-Logik entfernen
+3. Kein sonstiger Code-Umbau nötig — Struktur ist bereits vorbereitet
+
+**Shader-Workaround (aktuell):**
+- Planeten: GLSL-Kreisclip-Shader auf `Sprite2D`-Nodes mit `AtlasTexture` — klappt teilweise
+- Schiff: Luminanz-basierter Alpha-Shader — klappt gut
+- Sobald transparente PNGs da sind: Shader entfernen, direkt laden
+
+---
+
 ## Design-Entscheidungen
 
 | Thema | Entscheidung | Begründung |
@@ -107,7 +137,7 @@ Project Emptiness/
 | Wirtschaft | Abstrahiert (Formel-basiert) | X4-Feeling ohne vollständige Simulation |
 | KI-Simulation | Tick-basiert (1 Tag = 24 Sek) | Performance, kein Frame-Tracking |
 | 3D | Nein, komplett 2D | Top-Down |
-| Grafik-Timing | Erst Mechaniken, dann Sprites | Sprites ab Monat 2 via Midjourney |
+| Grafik-Timing | Erst Mechaniken, dann Sprites | Sprites von Aras (GPT Image 2), parallel zu Mechaniken |
 | Innenraum | The Last Starship Querschnitt-Stil | Monat 3, nach Kampf + Handel |
 | Planet Landing | Geplant für Monat 2 (Tag 15) | Gameplay-Scope noch TBD |
 
@@ -117,7 +147,7 @@ Project Emptiness/
 
 - **Hintergrund:** `Color(0.02, 0.02, 0.055)` — fast schwarz, Blaustich
 - **Sternfarben:** Yellow `#FFD938`, Orange `#FF8C1F`, Red `#EB3A2E`, Blue `#4794FF`, White `#EDF0FF`, Neutron `#AE47FF`
-- **Planetfarben:** Terran grün, Ocean blau, Desert braun, Ice weiß, Volcanic rot, GasGiant braun-orange, Barren grau, Toxic giftgrün
+- **Planeten:** aktuell Sprite-basiert (AI-generiert, Shader-Workaround) → werden durch transparente PNGs von Aras ersetzt
 - **Fraktionsfarben:** Terran `#4577FF`, Syndicate `#FF4D26`, Void `#A640FF`, Alliance `#33E573`
 - **UI:** Dunkle Panels, helle Labels, Sci-Fi-minimalistisch
 - **Font:** Godot FallbackFont jetzt → Sci-Fi Monospace Font in Monat 3
