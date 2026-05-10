@@ -15,7 +15,9 @@ Read this before generating anything new.
 | **Orientation** | Top-down view (camera looks straight down) |
 | **Style** | Dark sci-fi, Starsector-inspired — realistic but stylized, not cartoon |
 
-**Why transparent background matters:** The game engine (Godot 4) composites sprites onto animated backgrounds. Black or colored backgrounds cause ugly rectangles around assets. Every sprite must have a transparent alpha channel outside the object.
+**Why transparent background matters:** The game engine (Godot 4) composites sprites onto animated backgrounds. Black, white, or any colored background causes ugly rectangles around assets. Every sprite must have a **transparent alpha channel** (checkerboard pattern in your image editor) outside the object — not white, not black, not grey. If you open the PNG in an image editor and see a solid color behind the object, it is wrong.
+
+**How to verify:** Open the file in Photoshop, GIMP, or any PNG viewer. The area outside the planet/ship should show a grey-and-white checkerboard pattern. If it shows a solid color, the transparency is missing.
 
 ---
 
