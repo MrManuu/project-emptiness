@@ -14,11 +14,15 @@ public partial class SystemView : Node2D
         GD.Load<PackedScene>("res://scenes/GalaxyMap/GalaxyMap.tscn");
     private static readonly PackedScene StationTradeScene =
         GD.Load<PackedScene>("res://scenes/StationTrade/StationTrade.tscn");
+    private static readonly PackedScene CombatScene =
+        GD.Load<PackedScene>("res://scenes/Combat/Combat.tscn");
 
-    private const float StarRadius       = 40f;
+    private const float StarRadius        = 40f;
     private const float PlanetSpriteHalf = 22f;
     private const float StationHalf      = 8f;
     private const float ClickThreshold   = 24f;
+    private const float PirateOrbitRadius = 680f;
+    private const float PirateHalf        = 11f;
 
     private static readonly float[] OrbitRadii  = { 130f, 210f, 300f, 400f, 510f, 630f };
     private static readonly float[] OrbitSpeeds = { 0.18f, 0.13f, 0.09f, 0.065f, 0.048f, 0.036f };
@@ -38,6 +42,8 @@ public partial class SystemView : Node2D
     private float[]    _stationAngles = Array.Empty<float>();
     private int        _selectedPlanet  = -1;
     private int        _selectedStation = -1;
+    private bool       _selectedPirate;
+    private float      _pirateAngle     = 1.3f;
     private Station?   _dockedStation;
 
     // UI
@@ -128,6 +134,7 @@ public partial class SystemView : Node2D
             int slot = _system.Planets.Count + i;
             _stationAngles[i] += OrbitSpeeds[Math.Min(slot, OrbitSpeeds.Length - 1)] * 0.7f * dt;
         }
+        _pirateAngle += 0.024f * dt;
         QueueRedraw();
     }
 
@@ -192,6 +199,22 @@ public partial class SystemView : Node2D
                 _system.Stations[i].Name, HorizontalAlignment.Left, -1, 10,
                 new Color(0.9f, 0.9f, 0.6f, 0.6f));
         }
+
+        // Pirate patrol ship
+        DrawArc(Vector2.Zero, PirateOrbitRadius, 0, Mathf.Tau, 64,
+            new Color(0.8f, 0.2f, 0.2f, 0.04f), 1f, true);
+        var pp = GetPiratePos();
+        if (_selectedPirate)
+            DrawArc(pp, PirateHalf + 7f, 0, Mathf.Tau, 20, new Color(1f, 0.3f, 0.2f, 0.7f), 1.5f, true);
+        DrawPolygon(new Vector2[]
+        {
+            pp + new Vector2(0f,                   -PirateHalf * 1.5f),
+            pp + new Vector2(-PirateHalf * 0.75f,   PirateHalf * 0.7f),
+            pp + new Vector2( PirateHalf * 0.75f,   PirateHalf * 0.7f),
+        }, new Color[] { new Color(1f, 0.28f, 0.18f, 0.85f) });
+        DrawString(ThemeDB.FallbackFont, pp + new Vector2(PirateHalf + 6f, 3f),
+            "⚠ Pirate Patrol", HorizontalAlignment.Left, -1, 10,
+            new Color(1f, 0.4f, 0.3f, 0.65f));
     }
 
     // ── Input ──────────────────────────────────────────────────────────────────
@@ -237,6 +260,15 @@ public partial class SystemView : Node2D
                 return;
             }
         }
+        if (worldPos.DistanceTo(GetPiratePos()) < ClickThreshold)
+        {
+            _selectedPirate  = true;
+            _selectedPlanet  = -1;
+            _selectedStation = -1;
+            ShowPirateInfo();
+            return;
+        }
+        _selectedPirate  = false;
         _selectedPlanet  = -1;
         _selectedStation = -1;
         _infoPanel.Visible = false;
@@ -279,8 +311,22 @@ public partial class SystemView : Node2D
         _infoPanel.Visible = true;
     }
 
+    private void ShowPirateInfo()
+    {
+        _lblObjectName.Text = "Pirate Patrol";
+        _lblDetails.Text    = "Hostile frigate.\nHull: 600  Shields: 300\nReward: 2,000 credits";
+        _btnDock.Text       = "⚔  Attack";
+        _btnDock.Visible    = true;
+        _infoPanel.Visible  = true;
+    }
+
     private void OnDockPressed()
     {
+        if (_selectedPirate)
+        {
+            GetTree().Root.GetNode<Main>("Main").LoadScene(CombatScene);
+            return;
+        }
         if (_dockedStation == null) return;
         GameState.Instance.CurrentStation = _dockedStation;
         GetTree().Root.GetNode<Main>("Main").LoadScene(StationTradeScene);
@@ -301,6 +347,9 @@ public partial class SystemView : Node2D
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────────
+    private Vector2 GetPiratePos() =>
+        new(MathF.Cos(_pirateAngle) * PirateOrbitRadius, MathF.Sin(_pirateAngle) * PirateOrbitRadius);
+
     private static string GetPlanetPath(PlanetType type)
     {
         string path = type switch
