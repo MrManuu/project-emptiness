@@ -13,16 +13,23 @@ public partial class SystemView : Node2D
     private static readonly PackedScene GalaxyMapScene =
         GD.Load<PackedScene>("res://scenes/GalaxyMap/GalaxyMap.tscn");
 
-    private const float StarRadius     = 40f;
-    private const float PlanetRadius   = 10f;
-    private const float StationHalf    = 8f;
-    private const float ClickThreshold = 22f;
+    private const float StarRadius       = 40f;
+    private const float PlanetSpriteHalf = 20f;
+    private const float StationHalf      = 8f;
+    private const float ClickThreshold   = 22f;
+
+    private static readonly Rect2 RockyRegion = new(0f,   512f, 512f, 512f);
+    private static readonly Rect2 BlueRegion  = new(512f, 512f, 512f, 512f);
 
     private static readonly float[] OrbitRadii  = { 130f, 210f, 300f, 400f, 510f, 630f };
     private static readonly float[] OrbitSpeeds = { 0.18f, 0.13f, 0.09f, 0.065f, 0.048f, 0.036f };
 
     private static readonly Color OrbitColor = new(1f, 1f, 1f, 0.06f);
     private static readonly Color TextColor  = new(0.75f, 0.8f, 0.95f, 0.65f);
+
+    // Textures
+    private Texture2D _planetSheet1 = null!;
+    private Texture2D _planetSheet2 = null!;
 
     // State
     private Camera2D   _camera        = null!;
@@ -45,6 +52,20 @@ public partial class SystemView : Node2D
     {
         _camera = GetNode<Camera2D>("Camera2D");
         _system = GameState.Instance.CurrentSystem!;
+
+        // Background nebula
+        var bgRect = GetNode<TextureRect>("Background/BgRect");
+        bgRect.Texture  = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-02-painterly-probe/background-01.png");
+        bgRect.Modulate = new Color(0.6f, 0.55f, 0.7f, 1f);
+
+        // Planet sheets (1024x1024, 2x2 grid — planets in bottom half)
+        _planetSheet1 = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-01-clean-tactical/planet-01.png");
+        _planetSheet2 = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-01-clean-tactical/planet-02.png");
+
+        // Player ship
+        var ship = GetNode<Sprite2D>("PlayerShip");
+        ship.Texture = GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-01-clean-tactical/ship-01.png");
+        ship.Scale   = new Vector2(0.055f, 0.055f);
 
         int p = _system.Planets.Count;
         int s = _system.Stations.Count;
@@ -126,13 +147,16 @@ public partial class SystemView : Node2D
         {
             float r   = OrbitRadii[Math.Min(i, OrbitRadii.Length - 1)];
             var   pos = new Vector2(MathF.Cos(_planetAngles[i]) * r, MathF.Sin(_planetAngles[i]) * r);
-            var   col = PlanetColor(_system.Planets[i].Type);
 
             if (i == _selectedPlanet)
-                DrawArc(pos, PlanetRadius + 5f, 0, Mathf.Tau, 24, new Color(1f, 1f, 1f, 0.6f), 1.5f, true);
+                DrawArc(pos, PlanetSpriteHalf + 5f, 0, Mathf.Tau, 24, new Color(1f, 1f, 1f, 0.6f), 1.5f, true);
 
-            DrawCircle(pos, PlanetRadius, col);
-            DrawString(ThemeDB.FallbackFont, pos + new Vector2(PlanetRadius + 3f, 3f),
+            var (sheet, region) = GetPlanetSprite(_system.Planets[i].Type);
+            var destRect = new Rect2(pos - new Vector2(PlanetSpriteHalf, PlanetSpriteHalf),
+                                     new Vector2(PlanetSpriteHalf * 2f, PlanetSpriteHalf * 2f));
+            DrawTextureRectRegion(sheet, destRect, region);
+
+            DrawString(ThemeDB.FallbackFont, pos + new Vector2(PlanetSpriteHalf + 3f, 3f),
                 _system.Planets[i].Name, HorizontalAlignment.Left, -1, 10, TextColor);
         }
 
@@ -264,6 +288,19 @@ public partial class SystemView : Node2D
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────────
+    private (Texture2D sheet, Rect2 region) GetPlanetSprite(PlanetType type) => type switch
+    {
+        PlanetType.Terran   => (_planetSheet1, BlueRegion),
+        PlanetType.Ocean    => (_planetSheet2, BlueRegion),
+        PlanetType.Ice      => (_planetSheet1, BlueRegion),
+        PlanetType.Barren   => (_planetSheet1, RockyRegion),
+        PlanetType.Desert   => (_planetSheet2, RockyRegion),
+        PlanetType.Volcanic => (_planetSheet2, RockyRegion),
+        PlanetType.GasGiant => (_planetSheet1, RockyRegion),
+        PlanetType.Toxic    => (_planetSheet2, RockyRegion),
+        _                   => (_planetSheet1, RockyRegion)
+    };
+
     private static string Capitalize(string s) =>
         s.Length == 0 ? s : char.ToUpper(s[0]) + s[1..];
 
@@ -278,16 +315,4 @@ public partial class SystemView : Node2D
         _                => new Color(1f,    1f,    1f)
     };
 
-    private static Color PlanetColor(PlanetType t) => t switch
-    {
-        PlanetType.Terran   => new Color(0.28f, 0.58f, 0.28f),
-        PlanetType.Ocean    => new Color(0.2f,  0.45f, 0.85f),
-        PlanetType.Desert   => new Color(0.75f, 0.55f, 0.28f),
-        PlanetType.Ice      => new Color(0.8f,  0.88f, 1f),
-        PlanetType.Volcanic => new Color(0.85f, 0.3f,  0.1f),
-        PlanetType.GasGiant => new Color(0.7f,  0.55f, 0.45f),
-        PlanetType.Barren   => new Color(0.5f,  0.45f, 0.4f),
-        PlanetType.Toxic    => new Color(0.45f, 0.7f,  0.2f),
-        _                   => new Color(0.6f,  0.6f,  0.6f)
-    };
 }

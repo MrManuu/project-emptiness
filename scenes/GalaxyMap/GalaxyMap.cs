@@ -67,6 +67,10 @@ public partial class GalaxyMap : Node2D
         _lblDay        = GetNode<Label>("UI/HUD/TopBar/HBoxContainer/Day");
         _lblLocation   = GetNode<Label>("UI/HUD/TopBar/HBoxContainer/Location");
 
+        GetNode<TextureRect>("Background/BgRect").Texture =
+            GD.Load<Texture2D>("res://assets/concepts/gpt-image-2/pack-02-painterly-probe/background-01.png");
+        GetNode<TextureRect>("Background/BgRect").Modulate = new Color(0.22f, 0.18f, 0.28f, 1f);
+
         _btnJump.Pressed  += OnJumpPressed;
         _btnEnter.Pressed += OnEnterPressed;
         _infoPanel.Visible = false;

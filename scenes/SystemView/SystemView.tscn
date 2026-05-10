@@ -5,6 +5,20 @@
 [node name="SystemView" type="Node2D"]
 script = ExtResource("1_systemview")
 
+[node name="Background" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="BgRect" type="TextureRect" parent="Background"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+expand_mode = 1
+stretch_mode = 6
+
+[node name="PlayerShip" type="Sprite2D" parent="."]
+position = Vector2(0, -90)
+
 [node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="UI" type="CanvasLayer" parent="."]
