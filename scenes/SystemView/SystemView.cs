@@ -56,29 +56,26 @@ public partial class SystemView : Node2D
         bgRect.Texture  = GD.Load<Texture2D>("res://assets/backgrounds/bg-nebula-blue.png");
         bgRect.Modulate = new Color(1f, 1f, 1f, 1f);
 
-        // Planet sprites — circle-clip shader removes white background until Aras delivers true alpha PNGs
+        // Planet sprites — transparent PNGs from Aras, no shader needed
         float planetScale = PlanetSpriteHalf * 2f / 1024f;
-        var planetMat = MakePlanetCircleClip();
         _planetSprites = new Sprite2D[_system.Planets.Count];
         for (int i = 0; i < _system.Planets.Count; i++)
         {
             string path = GetPlanetPath(_system.Planets[i].Type);
             var sprite = new Sprite2D
             {
-                Texture  = GD.Load<Texture2D>(path),
-                Scale    = new Vector2(planetScale, planetScale),
-                Material = planetMat,
-                ZIndex   = 1
+                Texture = GD.Load<Texture2D>(path),
+                Scale   = new Vector2(planetScale, planetScale),
+                ZIndex  = 1
             };
             AddChild(sprite);
             _planetSprites[i] = sprite;
         }
 
-        // Player ship — white-remove shader until Aras delivers true alpha PNG
+        // Player ship — transparent PNG from Aras, no shader needed
         var ship = GetNode<Sprite2D>("PlayerShip");
-        ship.Texture  = GD.Load<Texture2D>("res://assets/ships/ship-freighter.png");
-        ship.Scale    = new Vector2(0.05f, 0.05f);
-        ship.Material = MakeWhiteRemoveMaterial();
+        ship.Texture = GD.Load<Texture2D>("res://assets/ships/ship-freighter.png");
+        ship.Scale   = new Vector2(0.05f, 0.05f);
 
         // Orbit angles
         int p = _system.Planets.Count;
@@ -295,35 +292,6 @@ public partial class SystemView : Node2D
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────────
-    private static ShaderMaterial MakePlanetCircleClip()
-    {
-        var shader = new Shader();
-        shader.Code = """
-            shader_type canvas_item;
-            void fragment() {
-                vec2 uv = UV - vec2(0.5);
-                COLOR = texture(TEXTURE, UV);
-                COLOR.a = step(length(uv), 0.5);
-            }
-            """;
-        return new ShaderMaterial { Shader = shader };
-    }
-
-    private static ShaderMaterial MakeWhiteRemoveMaterial()
-    {
-        var shader = new Shader();
-        shader.Code = """
-            shader_type canvas_item;
-            uniform float threshold : hint_range(0.0, 1.0) = 0.82;
-            void fragment() {
-                COLOR = texture(TEXTURE, UV);
-                float brightness = dot(COLOR.rgb, vec3(0.299, 0.587, 0.114));
-                COLOR.a = 1.0 - smoothstep(threshold - 0.06, threshold, brightness);
-            }
-            """;
-        return new ShaderMaterial { Shader = shader };
-    }
-
     private static string GetPlanetPath(PlanetType type)
     {
         string path = type switch
