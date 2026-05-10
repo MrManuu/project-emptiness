@@ -153,11 +153,14 @@ public partial class Combat : Node2D
             _playerAngle = MathF.Atan2(toMouse.X, -toMouse.Y);
         _playerSprite.Rotation = _playerAngle - MathF.PI / 2f;
 
+        // Movement relative to ship facing: W=forward, S=back, A/D=strafe
+        Vector2 fwd   = FwdVec(_playerAngle);
+        Vector2 right = new Vector2(fwd.Y, -fwd.X);
         var move = Vector2.Zero;
-        if (Input.IsKeyPressed(Key.W)) move.Y -= 1;
-        if (Input.IsKeyPressed(Key.S)) move.Y += 1;
-        if (Input.IsKeyPressed(Key.A)) move.X -= 1;
-        if (Input.IsKeyPressed(Key.D)) move.X += 1;
+        if (Input.IsKeyPressed(Key.W)) move += fwd;
+        if (Input.IsKeyPressed(Key.S)) move -= fwd;
+        if (Input.IsKeyPressed(Key.A)) move -= right;
+        if (Input.IsKeyPressed(Key.D)) move += right;
         if (move.LengthSquared() > 0) move = move.Normalized();
 
         _playerVel += move * PlayerAccel * dt;
